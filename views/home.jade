@@ -1,0 +1,23 @@
+doctype html
+html(lang='en')
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
+    meta(name='keywords', content='WebRTC, HTML5, JavaScript')
+    meta(name='description', content='WebRTC Video Conference App')
+    meta(name='viewport', content='width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
+    script(src='/javascripts/home.js')
+    link(rel='stylesheet', type='text/css', href='/stylesheets/home.css', media='screen')
+    title WebRTC Video Conference App Example With Multiple peers
+  body
+    main#container
+      section#success
+        #room-link
+          a#room-url(target='_blank')
+        br
+        .bubble
+          | Participation link 
+          br
+          br
+          span
+            | Send this link to anyone you wish to invite.
