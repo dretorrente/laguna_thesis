@@ -1,9 +1,7 @@
-'use strict';
-
 var meeting;
 var host = HOST_ADDRESS; // HOST_ADDRESS gets injected into room.ejs from the server side when it is rendered
 
-$( document ).ready(function() {
+$(document).ready(function() {
 	/////////////////////////////////
 	// CREATE MEETING
 	/////////////////////////////////

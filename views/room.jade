@@ -5,12 +5,12 @@ html(lang='en')
     meta(name='description', content='WebRTC Reference App')
     meta(name='viewport', content='width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1')
     script(type='text/javascript').
-      var HOST_ADDRESS= "127.0.0.1";
+      var HOST_ADDRESS= "#{hostAddress}";
     <script src='/socket.io/socket.io.js'></script>
-    script(src='/javascripts/lib/adapter.js')
-    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
-    script(src='/javascripts/meeting.js')
-    script(src='/javascripts/room.js')
+    script(src='/javascripts/lib/adapter.js',type='text/javascript')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js',type='text/javascript')
+    script(src='/javascripts/meeting.js',type='text/javascript')
+    script(src='/javascripts/room.js',type='text/javascript')
     link(rel='stylesheet', type='text/css', href='/stylesheets/room.css', media='screen')
     title #{hostAddress}
   body

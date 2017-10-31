@@ -11,19 +11,24 @@ var LocalStrategy = require('passport-local').Strategy;
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
 
-
+var fs = require('fs');
+var https = require('https');
 var User = require('./models/user');
-
+var options = {
+  key: fs.readFileSync('./file.pem'),
+  cert: fs.readFileSync('./file.crt')
+};
 var app = express();
 var mdbUrl = require('./config/database.js');
 var db = require('./db'); //mongoose is in db.js
-var server = require('http').Server(app);
+
+var server = https.createServer(options, app);
 var io = require('socket.io').listen(server);
 // view engine setup
-var socketIoServer = '127.0.0.1';
+
 // var index = require('./routes/index');
 var auth = require('./routes/auth');
-require('./routes/video')(app,socketIoServer);
+require('./routes/video')(app);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 

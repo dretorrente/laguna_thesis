@@ -1,8 +1,6 @@
-'use strict';
-
 var roomUrl;
 
-$( document ).ready(function() {
+$(document).ready(function() {
     generateRoomUrl();
 
 }); // end of document.ready
@@ -25,7 +23,7 @@ function shortUrl() {
 function generateRoomUrl() {
     var room = shortUrl();
 	var link = document.getElementById("room-url");
-	roomUrl =  'http://'+window.location.host+'/'+room;
+	roomUrl =  'https://'+window.location.host+'/'+room;
 	link.href = roomUrl;
 	link.innerHTML = roomUrl;
 }

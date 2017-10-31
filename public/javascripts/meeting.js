@@ -1,5 +1,3 @@
-'use strict';
-
 var Meeting = function (socketioHost) { 
     var exports = {};
     
