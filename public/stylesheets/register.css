@@ -9,7 +9,7 @@ h1 {
     font-family:"Courier New", Courier, monospace;
     color: #FF00CC;
 }
-form {
+form, div#form {
     margin: 20px auto;
     width: 320px;
     color: C0C0C0;
