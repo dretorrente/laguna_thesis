@@ -2,14 +2,43 @@ doctype html
 html
     head
         title  K-Pop World
-        link(rel='stylesheet', type='text/css', href='/stylesheets/register.css')
+        link(rel='stylesheet', href='/stylesheets/bootstrap.css')
+        link(rel='stylesheet', type='text/css', href='/stylesheets/login.css')
     body
             div#form
-            h1  Login
+                h1  Login
+                if(errors)
+                    .alert.alert-danger.alert-dismissable(role='alert')
+                        button.close(type='button', data-dismiss='alert', aria-label='Close')
+                            span(aria-hidden='true') x
+
+                        strong Warning!
+                        for error in errors
+                            | #{error.msg}.
+
+                if(success_msg != "")
+                    .alert.alert-success.alert-dismissable(role='alert')
+                        button.close(type='button', data-dismiss='alert', aria-label='Close')
+                            span(aria-hidden='true') x
+                        strong Success!
+                            | #{success_msg}
+                if(error_msg != "")
+                    .alert.alert-danger.alert-dismissable(role='alert')
+                        button.close(type='button', data-dismiss='alert', aria-label='Close')
+                            span(aria-hidden='true') x
+                        strong Warning!
+                            | #{error_msg}
+                if(error != "")
+                    .alert.alert-danger.alert-dismissable(role='alert')
+                        button.close(type='button', data-dismiss='alert', aria-label='Close')
+                            span(aria-hidden='true') x
             form(method='post')
                 label(for='username')  Username (required)
                 input#username(type='text', name='username', required='', autofocus='', placeholder='Your username', pattern='[a-zA-Z]{3,}')
                 label(for='password')  Password (required)
                 input#password(type='password', name="password" required='', autofocus='', placeholder='Password')
-                input(type='submit',name="submit", value='Login')
+                input(type='submit', name="submit", value='Login', class='form-control')
                 a(href='/auth/register')  No account yet?.
+    // jQuery
+    script(src='/javascripts/jquery-3.2.0.min.js')
+    script(src='/javascripts/bootstrap.min.js')
