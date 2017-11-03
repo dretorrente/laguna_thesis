@@ -1,7 +1,5 @@
-'use strict';
- 
 module.exports=function(app, socketIoServer) {
-    app.get('/',function(req,res){
+    app.get('/video',function(req,res){
         res.render('home');
     });
     

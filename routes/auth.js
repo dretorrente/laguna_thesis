@@ -34,9 +34,9 @@ passport.deserializeUser(function(id, done) {
 });
 
 router.get('/login', function(req, res, next){
-    // if(req.isAuthenticated()){
-    //     res.redirect('/')
-    // }
+    if(req.isAuthenticated()){
+        res.redirect('/')
+    }
     res.render('login',{title: 'Login'});
 });
 
@@ -51,18 +51,20 @@ router.post('/login', function(req, res, next) {
             return res.redirect('/auth/login')
         }
         req.logIn(user, function (err) {
-            if (err) return next(err);
-            console.log(user);
-            return res.redirect('/');
+            if (err){
+                console.log(err);
+                return next(err);
+            }
+            return res.redirect('/dashboard');
         });
     })(req, res, next);
 });
 
 
 router.get('/register', function(req,res,next){
-    // if(req.isAuthenticated()){
-    //     res.redirect('/')
-    // }
+    if(req.isAuthenticated()){
+        res.redirect('/')
+    }
     res.render('register',{title: 'Register'});
 });
 
@@ -74,12 +76,7 @@ router.post('/register', function(req, res, next){
     var gender = req.body.gender && req.body.gender.trim();
     var password = req.body.password;
 
-    //     // Sanitize
-    req.sanitize('username').trim();
-    req.sanitize('name').trim();
-    req.sanitize('gender').trim();
-    req.sanitize('email').trim();
-
+   
         var user = new User({
             username: username,
             name: name,
@@ -90,8 +87,8 @@ router.post('/register', function(req, res, next){
 
         user.save(function(err){
             if (err) {
-                res.render('login', {
-                    title: 'Login',
+                res.render('register', {
+                    title: 'Register',
                     errors: err,
                     data: {
                         username: username,
@@ -102,7 +99,7 @@ router.post('/register', function(req, res, next){
                 });
 
             } else {
-                // req.flash('success_msg', 'You are now registered. Log-in to continue.');
+                req.flash('success_msg', 'You are now registered. Log-in to continue.');
                 res.redirect('/auth/login');
             }
         });

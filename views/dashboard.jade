@@ -1,0 +1,53 @@
+doctype html
+html
+    head
+        title  K-Pop World
+        link(rel='stylesheet', type='text/css', href='/stylesheets/dashboard.css')
+    body
+        .header
+            #fingerhart.header
+                img(src='/images/logo1.png', height='80px', width='170px')
+            #searcharea.header
+                input#searchbox(placeholder='search here...', type='text')
+            #actarea.header
+                a(href='/dashboard')  Home
+            #profilearea1.header  |
+            #message.header
+                a(href='chat.html')
+                    img(src='/images/messages.png', height='70px', width='70px')
+            #profilearea2.header  |
+            #profile.header
+                a(href='profile1.html')
+                    img(src='/images/profile-pic.png', height='80px', width='90px')
+            #profilearea3.header  |
+            #Setting.header
+                a(href='Setting.html')
+                    img(src='/images/settings.png', height='70px', width='50px')
+        .post00
+            #column-1.post00
+                | Update status | Add photos/videos
+                input#here(type='file')
+                hr
+                br
+                br
+                br
+                br
+                br
+                br
+                hr
+            #postpos.post00
+                input#buttonpost(type='submit', name='submit', value='post')
+            #postboxpos.post00
+                textarea#postbox(placeholder="What's on your mind", type='text')
+            .post10
+                .post1
+                    img(src='/images/user-profile.png', height='50', width='50')
+                    p.one  Jun Hyuek
+                    br
+                    br
+                    img(src='/images/kpop1.gif', height='350', width='580')
+                    br
+                    br
+                    p.six Like Comment Share
+                    br
+                    hr

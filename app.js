@@ -4,13 +4,13 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var logger = require('morgan');
+var expressValidator = require('express-validator');
+var flash = require('connect-flash');
 var session = require('express-session');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
-
 var fs = require('fs');
 var https = require('https');
 var User = require('./models/user');
@@ -20,7 +20,6 @@ var options = {
 };
 var app = express();
 var mdbUrl = require('./config/database.js');
-var db = require('./db'); //mongoose is in db.js
 
 var server = https.createServer(options, app);
 var io = require('socket.io').listen(server);
@@ -28,19 +27,21 @@ var io = require('socket.io').listen(server);
 
 // var index = require('./routes/index');
 var auth = require('./routes/auth');
-require('./routes/video')(app);
+var dashboard = require('./routes/index');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// db.connect(mdbUrl.url, function(err) {
-//     if (err) {
-//         console.log('Unable to connect to mongoose');
-//         process.exit(1);
-//     }else {
-//         console.log("Connected to DB!");
-//     }
+mongoose.connect(mdbUrl.url, { useMongoClient: true },function(err) {
 
-// });
+    if (err) {
+        console.log('Unable to connect to mongoose');
+        process.exit(1);
+    }else {
+        console.log("Connected to DB!");
+    }
+
+});
+mongoose.Promise = global.Promise;
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -49,9 +50,58 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/video', video);
-app.use('/auth', auth);
+// Express Session
+app.use(session({
+    secret: 'secret',
+    saveUninitialized: true,
+    resave: true
+}));
 
+// Passport init
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Express Validator
+app.use(expressValidator({
+  errorFormatter: function(param, msg, value) {
+      var namespace = param.split('.')
+      , root    = namespace.shift()
+      , formParam = root;
+
+    while(namespace.length) {
+      formParam += '[' + namespace.shift() + ']';
+    }
+    return {
+      param : formParam,
+      msg   : msg,
+      value : value
+    };
+  }
+}));
+
+// Connect Flash
+app.use(flash());
+
+
+// Global Vars
+app.use(function (req, res, next) {
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  res.locals.error = req.flash('error');
+  res.locals.user = req.user || null;
+  next();
+});
+
+app.use('/auth', auth);
+app.use(function(req, res, next){
+  if(req.isAuthenticated()){
+    next();
+    return;
+  }
+  res.redirect('/auth/login');
+});
+app.use('/', dashboard);
+require('./routes/video')(app);
 io.sockets.on('connection', function (socket){
     
 	function log(){
