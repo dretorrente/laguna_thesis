@@ -1,28 +1,36 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var expressValidator = require('express-validator');
-var flash = require('connect-flash');
-var session = require('express-session');
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-var mongo = require('mongodb');
-var mongoose = require('mongoose');
-var fs = require('fs');
-var https = require('https');
+// Libraries
+var express = require('express'),
+    path = require('path'),
+    favicon = require('serve-favicon'),
+    logger = require('morgan'),
+    cookieParser = require('cookie-parser'),
+    bodyParser = require('body-parser'),
+    expressValidator = require('express-validator'),
+    flash = require('connect-flash'),
+    session = require('express-session'),
+    passport = require('passport'),
+    mongoose = require('mongoose'),
+    fs = require('fs'),
+    https = require('https');
+
+// Load models
 var User = require('./models/user');
+var Like = require('./models/like');
+var Comment = require('./models/comment');
+var Post    = require('./models/post');
+var Media   = require('./models/media');
+//configurations
 var options = {
   key: fs.readFileSync('./file.pem'),
   cert: fs.readFileSync('./file.crt')
 };
-var app = express();
-var mdbUrl = require('./config/database.js');
+var app = express(),
+    mdbUrl = require('./config/database.js'),
+    server = https.createServer(options, app),
+    io = require('socket.io').listen(server);
 
-var server = https.createServer(options, app);
-var io = require('socket.io').listen(server);
+const restify = require('express-restify-mongoose');
+const router = express.Router();
 // view engine setup
 
 // var index = require('./routes/index');
@@ -46,7 +54,7 @@ mongoose.Promise = global.Promise;
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -60,6 +68,16 @@ app.use(session({
 // Passport init
 app.use(passport.initialize());
 app.use(passport.session());
+
+
+// Express Restify Mongoose
+restify.serve(router, Post);
+restify.serve(router, User);
+restify.serve(router, Like);
+restify.serve(router, Comment);
+restify.serve(router, Media);
+app.use(router);
+
 
 // Express Validator
 app.use(expressValidator({
@@ -100,7 +118,7 @@ app.use(function(req, res, next){
   }
   res.redirect('/auth/login');
 });
-app.use('/', dashboard);
+app.use('/dashboard', dashboard);
 require('./routes/video')(app);
 io.sockets.on('connection', function (socket){
     

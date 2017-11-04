@@ -3,9 +3,18 @@ var router = express.Router();
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var async = require('async');
-
-// var configAuth = require('../config/passport');
 var User = require('../models/user');
+var multer = require('multer');
+var fs = require('fs');
+var storage =   multer.diskStorage({
+    destination: function (req, file, callback) {
+        callback(null, 'public/images/');
+    },
+    filename: function (req, file, callback) {
+        callback(null,Date.now() + "-" + file.originalname);
+    }
+});
+var uploads = multer({ storage : storage});
 
 passport.use('local', new LocalStrategy({passReqToCallback:true},function(req, username, password, done) {
     var username = username.toLowerCase();
@@ -69,43 +78,48 @@ router.get('/register', function(req,res,next){
 });
 
 
-router.post('/register', function(req, res, next){
+router.post('/register', uploads.single('upload'), function(req, res, next){
     var username = req.body.username && req.body.username.trim();
     var name = req.body.name && req.body.name.trim();
     var email = req.body.email && req.body.email.trim();
     var gender = req.body.gender && req.body.gender.trim();
     var password = req.body.password;
+    var image    = req.file.filename;
+    var errors = [];
+    var user = new User({
+        username: username,
+        name: name,
+        gender: gender,
+        email: email.toLowerCase(),
+        password: password,
+        upload: image
+    });
 
-   
-        var user = new User({
-            username: username,
-            name: name,
-            gender: gender,
-            email: email.toLowerCase(),
-            password: password
-        });
-
-        user.save(function(err){
-            if (err) {
-                res.render('register', {
-                    title: 'Register',
-                    errors: err,
-                    data: {
-                        username: username,
-                        name: name,
-                        gender: gender,
-                        email: email
-                    }
-                });
-
-            } else {
-                req.flash('success_msg', 'You are now registered. Log-in to continue.');
-                res.redirect('/auth/login');
+    user.save(function(err){
+        if (err) {
+            fs.unlinkSync('public/images/'+image);
+            if(err.errors.email.message){
+                var splitString = err.errors.email.message;
+                var emailError = splitString.substring(0, splitString.indexOf('.'));
+                errors.push({'email': emailError})
             }
-        });
+            res.render('register', {
+                title: 'Register',
+                errors: errors,
+                data: {
+                    username: username,
+                    name: name,
+                    gender: gender,
+                    email: email
+                }
+            });
 
+        }else{
+            req.flash('success_msg', 'You are now registered. Log-in to continue.');
+            res.redirect('/auth/login');
+        }
+    });
 });
-
 
 
 router.get('/logout', function(req, res){
@@ -113,13 +127,5 @@ router.get('/logout', function(req, res){
     req.flash('success_msg', 'You are logged out!');
     res.redirect('/auth/login');
 });
-
-// route middleware to ensure user is logged in
-// function isLoggedIn(req, res, next) {
-//     if (req.isAuthenticated())
-//         return next();
-//
-//     res.redirect('/');
-// }
 
 module.exports = router;

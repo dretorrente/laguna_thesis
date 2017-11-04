@@ -2,25 +2,20 @@ doctype html
 html
     head
         title  K-Pop World
+        link(rel='stylesheet', href='/stylesheets/bootstrap.css')
         link(rel='stylesheet', type='text/css', href='/stylesheets/register.css')
     body
             div#form
-            h1  Register for K-Pop World
-            if(errors)
-                .alert.alert-danger.alert-dismissable(role='alert')
-                    button.close(type='button', data-dismiss='alert', aria-label='Close')
-                        span(aria-hidden='true') x
-
-                    strong Warning!
-                    for error in errors
-                        | #{error.msg}.
-            form(method='post')
+                h1  Register for K-Pop World
+            form(method="post", enctype="multipart/form-data")
                 label(for='name')  Name (required)
                 input#name(type='text', name='name', required='', autofocus='', placeholder='Your name', pattern='[a-zA-Z]{3,}', value=(data ? '#{data.name}' : ''))
                 label(for='username')  Username (required)
                 input#username(type='text', name='username', required='', autofocus='', placeholder='Your username', pattern='[a-zA-Z]{3,}', value=(data ? '#{data.username}' : ''))
                 label(for='email')  Email Address (required)
                 input#Email(type='text', name='email', required='', autofocus='', pattern='[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,3}$', placeholder='Your Email address', value=(data ? '#{data.email}' : ''))
+                if(errors)
+                    span(style='color:red') #{errors[0].email}
                 label(for='password')  Choose a password (required)
                 input#password(type='password', required='', name="password", autofocus='', placeholder='Password')
                 div
@@ -28,5 +23,8 @@ html
                     label(for='male') Male
                     input#female(type='radio', value='female', name='gender')
                     label(for='female') Female
+                input(type='file', name='upload', accept='image/*', required='')
                 input(type='submit', name="register", value='Register')
                 a(href='Homepage.html')  Already have an account.
+    script(src='/javascripts/jquery-3.2.0.min.js')
+    script(src='/javascripts/bootstrap.min.js')

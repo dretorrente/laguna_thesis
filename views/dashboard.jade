@@ -2,52 +2,85 @@ doctype html
 html
     head
         title  K-Pop World
+        link(rel='stylesheet', type='text/css', href='/stylesheets/bootstrap/css/bootstrap.min.css')
+        link(rel='stylesheet', type='text/css', href='/stylesheets/font-awesome-4.7.0/css/font-awesome.min.css')
         link(rel='stylesheet', type='text/css', href='/stylesheets/dashboard.css')
     body
-        .header
-            #fingerhart.header
-                img(src='/images/logo1.png', height='80px', width='170px')
-            #searcharea.header
-                input#searchbox(placeholder='search here...', type='text')
-            #actarea.header
-                a(href='/dashboard')  Home
-            #profilearea1.header  |
-            #message.header
-                a(href='chat.html')
-                    img(src='/images/messages.png', height='70px', width='70px')
-            #profilearea2.header  |
-            #profile.header
-                a(href='profile1.html')
-                    img(src='/images/profile-pic.png', height='80px', width='90px')
-            #profilearea3.header  |
-            #Setting.header
-                a(href='Setting.html')
-                    img(src='/images/settings.png', height='70px', width='50px')
-        .post00
-            #column-1.post00
-                | Update status | Add photos/videos
-                input#here(type='file')
-                hr
-                br
-                br
-                br
-                br
-                br
-                br
-                hr
-            #postpos.post00
-                input#buttonpost(type='submit', name='submit', value='post')
-            #postboxpos.post00
-                textarea#postbox(placeholder="What's on your mind", type='text')
-            .post10
-                .post1
-                    img(src='/images/user-profile.png', height='50', width='50')
-                    p.one  Jun Hyuek
-                    br
-                    br
-                    img(src='/images/kpop1.gif', height='350', width='580')
-                    br
-                    br
-                    p.six Like Comment Share
-                    br
-                    hr
+        nav.navbar.navbar-default
+            #nav-brand-container
+                a.navbar-brand(href='micro-blog.php')
+                    img(src='/stylesheets/dummy/logo1.png', alt='Dispute Bills')
+            #navbar-quiz.container
+                button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
+                    span.sr-only Toggle navigatipon
+                    span.icon-bar
+                    span.icon-bar
+                    span.icon-bar
+
+                .navbar-collapse.collapse
+                    ul.nav.navbar-nav.navbar-right
+                        li
+                            a(href='') Home
+                        li
+                            a(href='')
+                                img.nav-profile.img-circle(src='')
+                                |  Profile
+                        li.dropdown
+                            a.dropdown-toggle(href='#', data-toggle='dropdown')
+                                span.glyphicon.glyphicon-cog(aria-hidden='true')
+                                b.caret
+                            ul.dropdown-menu
+                                li
+                                    a(href='/auth/logout') Logout
+                    form.hidden-xs-down.navbar-form.search-menu.form-inline.pull-right
+                        #div-search.input-group(role='group')
+                            input#search.form-control(type='text', name='search', placeholder='Username..', aria-label='Username', aria-describedby='basic-addon1')
+                            .input-group
+                                li.nav-item.dropdown.show(style='list-style-type:none;')
+                                    #menuItem.dropdown-menu.dropdown-menu-right(role='menu', style='display:none')
+                                        h6.dropdown-header.active(tabindex='-1') no results found
+
+        section.row.sectionUser
+            #divpost.col-md-6.col-md-offset-3
+                .alertMessage.alert(style='display: none; margin-top:10px;')
+                // Say Hi to the User by User Authentication
+                h4
+                    | Hi Dave.
+                form#createPost(method='post')
+                    .form-group#textarea-tweet
+                        textarea#txtareaPost.form-control(name='post', rows='4', placeholder="What's on your mind..")
+                    #post-group.pull-right
+                        .form-group#imagepost-group
+                            input(type='file', name='postimage', accept='image/*|video/*', required='')
+                        .form-group#createpost-group
+                            input.form-control(type='hidden', name='hidden_id', value='#{user_id}')
+                            button#btnAdd.btn.btn-primary(type='button') Create Post
+
+
+        section.row.section2
+            .showdata-index.col-md-6.col-md-offset-3
+                article.post
+                    .alertMessage.alert.alert-edit(style='display: none;')
+                    .info.postByUser
+                        .row
+                            .pic-user
+                                    a(href='')
+                                        img.postImage.img-circle(src='https://images4.alphacoders.com/754/thumb-350-754961.jpg', alt='sample profile pic')
+                            .col-md-6.userName
+                                h4.header-post-user Dave
+                                p Posted on August 30, 2017
+                    p.contentPost Hala hala
+                    .clearfix
+                    .interaction.tweet-interact
+                        a.retweet(href='javascript:;')
+                            | Like
+                            |  |
+                        a.tweet-edit(href='javascript:;')  Comment |
+                        a#delete-item.tweet-delete(href='javascript:;')  Share
+                    .appendLike
+                        | Camsasota and 5 others like this
+
+
+    script(src='/javascripts/jquery-3.2.0.min.js')
+    script(src='/javascripts/bootstrap.min.js')
+    script(src='/javascripts/api/main.js')

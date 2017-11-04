@@ -1,11 +1,21 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
+var uniqueValidator = require('mongoose-unique-validator');
+var timestamps = require('mongoose-timestamp');
+var Moment = require('moment-timezone');
+var datetime = require('node-datetime');
+var dt;
 
+dt = datetime.create();
+var formatted = dt.format('m/d/Y');
+
+var dateTodo = Moment().tz('Singapore').format().replace(/T/, ' ').replace(/\+/g, ' ');
+var dateStatus = Moment().tz('Singapore').format('ha z').slice(1,4);
+var dateSlice = formatted + ' ' + dateTodo.slice(11,18) + dateStatus;
 var UserSchema = mongoose.Schema({
     username: {
         type: String,
         index: true,
-        unique: [true, 'Username already in use.'],
         required: true
     },
     name: {
@@ -16,7 +26,7 @@ var UserSchema = mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: [true, 'Email already in use.']
+        unique: true
     },
 
     password: {
@@ -30,10 +40,16 @@ var UserSchema = mongoose.Schema({
         enum: ['male', 'female']
     },
 
+    upload: {
+        type: String,
+        required: true
+    },
+    created_at: { type: String, default:  dateSlice},
+    updated_at: {type: String, default:  dateSlice},
+
     resetPasswordToken: String,
     resetPasswordExpires: Date
 });
-
 
 UserSchema.pre('save', function(next) {
     var user = this;
@@ -53,20 +69,7 @@ UserSchema.pre('save', function(next) {
 });
 
 
-//UserSchema.exports.getUserByUsername = function(username, callback){
-//	var query = {username: username};
-//	User.findOne(query, callback);
-//};
-//
-//UserSchema.exports.getUserByEmail = function(email, callback){
-//	var query = {email: email};
-//	User.findOne(query, callback);
-//};
-
-// module.exports.getUserById = function(id, callback){
-// 	User.findById(id, callback);
-// }
-
+UserSchema.plugin(uniqueValidator);
 UserSchema.methods.comparePassword = function(candidatePassword, cb) {
     bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
         if (err) return cb(err);
