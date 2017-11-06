@@ -1,11 +1,13 @@
-var express = require('express');
-var router = express.Router();
-var Post = require('../models/post');
+let express = require('express'),
+    router = express.Router(),
+    Post = require('../models/post');
 var User = require('../models/user');
 var Image = require('../models/image');
 var Video = require('../models/video');
+let Like = require('../models/like');
 var moment = require('moment');
 var fs = require('fs');
+var ObjectId = require('mongodb').ObjectId;
 let multer = require('multer');
 var storage =   multer.diskStorage({
     destination: function (req, file, callback) {
@@ -114,36 +116,66 @@ router.post('/createpost', uploads.single('postimage'), function(req, res, next)
         req.flash('success_msg', 'Successfully posted.');
         res.redirect('/dashboard');
     }
-
-
     savepost.save();
-    // let image    = req.file.filename;
-    //
-    // let savemedia = new Media({
-    //     name: image,
-    //     user_id: user_id,
-    //     post_id: user_post
-    // });
-    //
-    // savepost.save(function(err){
-    //     if (err) {
-    //         console.log(err);
-    //         res.send({success: false})
-    //     }else{
-    //         Post.findOne()
-    //             .populate({
-    //                 path: 'user_id',
-    //                 model: User,
-    //                 select: 'username upload'
-    //             }).sort({_id:-1}).limit(1).exec()
-    //             .then(data=>{
-    //                 res.send({success: true, data:data, format_moment: moment()});
-    //         }).catch(err=>{
-    //             throw err;
-    //         })
-    //     }
-    // });
-
 });
 
+router.post('/like', function(req, res, next) {
+    let post_id = req.body.post_id;
+    let user_id = req.body.user_id;
+    let auth_id = req.user.id;
+    var collection = Like.find();
+    collection.findOne({post_id:ObjectId(post_id)},function(err, data){
+        if(data.length >0) {
+                console.log(data.length);
+        } else{
+            let saveLike = new Like({
+                is_like: 1,
+                user_id: user_id,
+                post_id: post_id
+            });
+
+            saveLike.save(function(err){
+                if(err){
+                    console.log(err);
+                } else{
+                    res.send({respondLike: 1});
+                }
+            });
+       }    
+    });
+    // console.log(Like.count());
+    // like.count({post_id:post_id},function(count){
+        
+       // if(count != null) {
+       //      Like.findOne({post_id: post_id, user_id: user_id},function(err, entry){
+       //          console.log(entry);
+       //           res.send({success: 'false'});
+       //      });
+       // } else{
+       //      let saveLike = new Like({
+       //          is_like: 1,
+       //          user_id: user_id,
+       //          post_id: post_id
+       //      });
+
+       //      saveLike.save(function(err){
+       //          if(err){
+       //              console.log(err);
+       //          } else{
+       //              res.send({respondLike: 1});
+       //          }
+       //      });
+       // }    
+    // });
+    // Like.findOne({_id: post_id, user_id: user_id},function(err, data){
+    //     if(data != null){
+    //         console.log(1);
+    //     }else{
+    //         console.log(2);
+    //     }
+    // });
+    
+    // console.log("ASDASD",req.body);
+   
+});
 module.exports = router;

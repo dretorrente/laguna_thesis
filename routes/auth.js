@@ -57,12 +57,10 @@ router.post('/login', function(req, res, next) {
     }, function (err, user, info) {
         if (err) return next(err);
         if (!user) {
-            console.log(1231231231231);
             return res.redirect('/auth/login')
         }
         req.logIn(user, function (err) {
             if (err){
-                console.log(err);
                 return next(err);
             }
             return res.redirect('/dashboard');
