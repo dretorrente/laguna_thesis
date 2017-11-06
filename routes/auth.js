@@ -16,11 +16,11 @@ var storage =   multer.diskStorage({
 });
 var uploads = multer({ storage : storage});
 
-passport.use('local', new LocalStrategy({passReqToCallback:true},function(req, username, password, done) {
-    var username = username.toLowerCase();
-    User.findOne({ username: username }, function(err, user) {
-        if (err) return done(err);
-        if (!user) return done(null, false, req.flash('error_msg', 'Unknown username.'));
+passport.use('local', new LocalStrategy({passReqToCallback:true, usernameField: 'email'},function(req, email, password, done) {
+    var email = email.toLowerCase();
+    User.findOne({ email: email }, function(err, user) {
+        if (err)  return done(err);
+        if (!user) return done(null, false, req.flash('error_msg', 'Unknown email.'));
         user.comparePassword(password, function(err, isMatch) {
             if (isMatch) {
                 return done(null, user);
@@ -57,6 +57,7 @@ router.post('/login', function(req, res, next) {
     }, function (err, user, info) {
         if (err) return next(err);
         if (!user) {
+            console.log(1231231231231);
             return res.redirect('/auth/login')
         }
         req.logIn(user, function (err) {
@@ -85,7 +86,6 @@ router.post('/register', uploads.single('upload'), function(req, res, next){
     var gender = req.body.gender && req.body.gender.trim();
     var password = req.body.password;
     var image    = req.file.filename;
-    var errors = [];
     var user = new User({
         username: username,
         name: name,
@@ -94,31 +94,39 @@ router.post('/register', uploads.single('upload'), function(req, res, next){
         password: password,
         upload: image
     });
-
-    user.save(function(err){
-        if (err) {
-            fs.unlinkSync('public/images/'+image);
-            if(err.errors.email.message){
-                var splitString = err.errors.email.message;
-                var emailError = splitString.substring(0, splitString.indexOf('.'));
-                errors.push({'email': emailError})
+    var ext = image.substr(image.lastIndexOf('.') + 1);
+    if(ext === 'jpg' || ext === 'png' || ext === 'jpeg') {
+        user.save(function(err){
+            if (err) {
+                res.render('register', {
+                    title: 'Register',
+                    errors: err.errors.email.message,
+                    data: {
+                        username: username,
+                        name: name,
+                        gender: gender,
+                        email: req.body.email
+                    }
+                });
+            }else{
+                req.flash('success_msg', 'You are now registered. Log-in to continue.');
+                res.redirect('/auth/login');
             }
-            res.render('register', {
-                title: 'Register',
-                errors: errors,
-                data: {
-                    username: username,
-                    name: name,
-                    gender: gender,
-                    email: email
-                }
-            });
+        });
+    } else {
+        res.render('register', {
+            title: 'Register',
+            invalid: {upload: 'invalid image'},
+            data: {
+                username: username,
+                name: name,
+                gender: gender,
+                email: req.body.email
+            }
+        });
+    }
 
-        }else{
-            req.flash('success_msg', 'You are now registered. Log-in to continue.');
-            res.redirect('/auth/login');
-        }
-    });
+
 });
 
 

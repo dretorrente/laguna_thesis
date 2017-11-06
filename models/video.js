@@ -11,21 +11,13 @@ var dateSlice = formatted + ' ' + dateTodo.slice(11,18) + dateStatus;
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
-const likeSchema = new Schema({
-    post_id:{
-        type: Schema.Types.ObjectId, ref: 'Post',
-        required: [true,"Post id is undefined"]
-    },
-    user_id:{
-        type: Schema.Types.ObjectId, ref: 'Post',
-        required: [true,"User id is undefined"]
-    },
-    is_like: {
-        type: Boolean,
-        default: false
+const videoSchema = new Schema({
+    name:{
+        type: String,
+        required: [true,"Video is empty"]
     },
     created_at: { type: String, default:  dateSlice},
     updated_at: { type: String, default:  dateSlice}
 });
 
-module.exports = mongoose.model('Like', likeSchema);
+module.exports = mongoose.model('Video', videoSchema);

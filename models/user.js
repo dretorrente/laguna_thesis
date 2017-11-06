@@ -15,7 +15,6 @@ var dateSlice = formatted + ' ' + dateTodo.slice(11,18) + dateStatus;
 var UserSchema = mongoose.Schema({
     username: {
         type: String,
-        index: true,
         required: true
     },
     name: {
@@ -24,9 +23,33 @@ var UserSchema = mongoose.Schema({
     },
 
     email: {
+        index: true,
         type: String,
+        lowercase: true,
         required: true,
-        unique: true
+        validate: {
+            isAsync: true,
+            validator: function(value, isValid) {
+                const self = this;
+                return self.constructor.findOne({ email: value })
+                    .exec(function(err, user){
+                        if(err){
+                            throw err;
+                        }
+                        else if(user) {
+                            if(self.id === user.id) {  // if finding and saving then it's valid even for existing email
+                                return isValid(true);
+                            }
+                            return isValid(false);
+                        }
+                        else{
+                            return isValid(true);
+                        }
+
+                    })
+            },
+            message:  'The email address is already taken!'
+        },
     },
 
     password: {

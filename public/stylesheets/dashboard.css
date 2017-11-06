@@ -176,9 +176,13 @@ input#search{
 }
 
 #imagepost-group{
-    display: inline-block;
-    width: 210px;
+     display: inline-block;
+     width: 210px;
+ }
+#select_image {
+    width: 100%;
 }
+
 #createpost-group{
     display: inline-block;
     margin-right: 20px;
@@ -223,4 +227,14 @@ input#search{
 #txtareaPost{
     border: #FFFFFF;
     background: #CCCCCC;
+}
+.eachImage img {
+    width:100%;
+}
+.gallery {
+    padding-bottom: 15px;
+}
+.post-video video{
+    padding: 10px 0;
+    width:100%;
 }

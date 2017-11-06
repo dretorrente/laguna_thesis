@@ -18,7 +18,7 @@ var User = require('./models/user');
 var Like = require('./models/like');
 var Comment = require('./models/comment');
 var Post    = require('./models/post');
-var Media   = require('./models/media');
+var Image   = require('./models/image');
 //configurations
 var options = {
   key: fs.readFileSync('./file.pem'),
@@ -75,7 +75,7 @@ restify.serve(router, Post);
 restify.serve(router, User);
 restify.serve(router, Like);
 restify.serve(router, Comment);
-restify.serve(router, Media);
+restify.serve(router, Image);
 app.use(router);
 
 

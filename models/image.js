@@ -11,20 +11,13 @@ var dateSlice = formatted + ' ' + dateTodo.slice(11,18) + dateStatus;
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
-const mediaSchema = new Schema({
+const imageSchema = new Schema({
     name:{
-        type: String
-    },
-    post_id:{
-        type: Schema.Types.ObjectId, ref: 'Post',
-        required: [true,"Post id is undefined"]
-    },
-    user_id:{
-        type: Schema.Types.ObjectId, ref: 'Post',
-        required: [true,"Post id is undefined"]
+        type: String,
+        required: [true,"Media is empty"]
     },
     created_at: { type: String, default:  dateSlice},
     updated_at: { type: String, default:  dateSlice}
 });
 
-module.exports = mongoose.model('Media', mediaSchema);
+module.exports = mongoose.model('Image', imageSchema);

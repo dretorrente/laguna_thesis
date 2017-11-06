@@ -5,6 +5,7 @@ html
         link(rel='stylesheet', type='text/css', href='/stylesheets/bootstrap/css/bootstrap.min.css')
         link(rel='stylesheet', type='text/css', href='/stylesheets/font-awesome-4.7.0/css/font-awesome.min.css')
         link(rel='stylesheet', type='text/css', href='/stylesheets/dashboard.css')
+
     body
         nav.navbar.navbar-default
             #nav-brand-container
@@ -42,45 +43,68 @@ html
 
         section.row.sectionUser
             #divpost.col-md-6.col-md-offset-3
+                if(success_msg != "")
+                    .alert.alert-success.alert-dismissable(role='alert')
+                        button.close(type='button', data-dismiss='alert', aria-label='Close')
+                            span(aria-hidden='true') x
+                        strong Success!
+                            | #{success_msg}
+                if(error_msg != "")
+                    .alert.alert-danger.alert-dismissable(role='alert')
+                        button.close(type='button', data-dismiss='alert', aria-label='Close')
+                            span(aria-hidden='true') x
+                        strong Warning!
+                            | #{error_msg}
                 .alertMessage.alert(style='display: none; margin-top:10px;')
                 // Say Hi to the User by User Authentication
                 h4
                     | Hi Dave.
-                form#createPost(method='post')
+                form#createPost(method='post', action="/dashboard/createpost", enctype="multipart/form-data")
                     .form-group#textarea-tweet
-                        textarea#txtareaPost.form-control(name='post', rows='4', placeholder="What's on your mind..")
+                        textarea#txtareaPost.form-control(name='post', rows='4', placeholder="What's on your mind..", required='')
                     #post-group.pull-right
                         .form-group#imagepost-group
-                            input(type='file', name='postimage', accept='image/*|video/*', required='')
+                            input#select_image(type='file', name='postimage', accept='image/*|video/*')
                         .form-group#createpost-group
                             input.form-control(type='hidden', name='hidden_id', value='#{user_id}')
-                            button#btnAdd.btn.btn-primary(type='button') Create Post
+                            button#btnAdd.btn.btn-primary(type='submit', name="submit") Create Post
 
 
-        section.row.section2
-            .showdata-index.col-md-6.col-md-offset-3
-                article.post
-                    .alertMessage.alert.alert-edit(style='display: none;')
-                    .info.postByUser
-                        .row
-                            .pic-user
-                                    a(href='')
-                                        img.postImage.img-circle(src='https://images4.alphacoders.com/754/thumb-350-754961.jpg', alt='sample profile pic')
-                            .col-md-6.userName
-                                h4.header-post-user Dave
-                                p Posted on August 30, 2017
-                    p.contentPost Hala hala
-                    .clearfix
-                    .interaction.tweet-interact
-                        a.retweet(href='javascript:;')
-                            | Like
-                            |  |
-                        a.tweet-edit(href='javascript:;')  Comment |
-                        a#delete-item.tweet-delete(href='javascript:;')  Share
-                    .appendLike
-                        | Camsasota and 5 others like this
+        section#section_posts.row.section2
+            if(posts)
+                for post in posts
+                    .showdata-index.col-md-6.col-md-offset-3
+                        article.post
+                            .info.postByUser
+                                .row
+                                    .pic-user
+                                            a(href='')
+                                                img.postImage.img-circle(src='/images/#{post.user_id.upload}', alt='avatar')
+                                    .col-md-6.userName
+                                        h4.header-post-user #{post.user_id.username}
+                                        p Posted on #{format_moment(post.created_at).format("MMM DD, YYYY HH:mmA")}
+                            p.contentPost #{post.status}
+                                .gallery
+                                    if(post.image)
+                                        .eachImage
+                                            img(src='/images/post-images/#{post.image.name}')
+                                    if(post.video)
+                                        .post-video
+                                            video(width='400', controls='')
+                                                source#video_here(src='/images/post-images/#{post.video.name}')
+                                                |     Your browser does not support HTML5 video.
+                            .interaction.post-interact(user_id="#{post.user_id.id}", post_id="#{post.id}")
+                                a.like(href='javascript:;')
+                                    | Like
+                                    |  |
+                                a.comment(href='javascript:;')  Comment |
+                                a.share(href='javascript:;')  Share
+                            .appendLike
+                                | Camsasota and 5 others like this
 
 
     script(src='/javascripts/jquery-3.2.0.min.js')
     script(src='/javascripts/bootstrap.min.js')
+    script(src='/javascripts/dateFormat.min.js')
     script(src='/javascripts/api/main.js')
+    script(type='text/javascript').
