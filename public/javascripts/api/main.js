@@ -9,15 +9,6 @@ $(document).ready(function(){
         userId = $(this).parent().attr("user_id");
         postId =  $(this).parent().attr("post_id");
         $this = $(this);
-        // fetch('api/v1/postId?query={"_id":"'+postId+'","user_id":"'+userId+'"}').populate({
-        //             path: 'like',
-        //             model: 'Like',
-        //             select: 'is_like'
-        //         }).then(function(res) {
-        //     res.json().then(function (entries) {
-        //         console.log(entries);
-        //     });
-        // });
         $.ajax({    
             method: 'POST',
             url: '/dashboard/like',
@@ -25,8 +16,12 @@ $(document).ready(function(){
                 user_id:userId, 
                 post_id:postId
             }
-
         }).done(function(res){
+            if(res.respondLike) {
+                $this.html('Liked |');
+            } else {
+                $this.html('Like |');
+            }
             console.log(res);
             // if(res)
             // {

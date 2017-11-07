@@ -238,3 +238,15 @@ input#search{
     padding: 10px 0;
     width:100%;
 }
+#message {
+    max-height:50px;
+}
+#message a {
+    height:50px;
+}
+#messenger {
+    font-size: 30px !important;
+    position: relative;
+    bottom: 5px;
+    color: lightsteelblue;
+}

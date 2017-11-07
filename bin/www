@@ -26,7 +26,7 @@ var server = require('../app').server;
  */
 
 // server.listen(port,"192.168.254.15");
-server.listen(port,"192.168.1.154");
+server.listen(port,"192.168.254.7");
 server.on('error', onError);
 server.on('listening', onListening);
 

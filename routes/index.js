@@ -123,10 +123,17 @@ router.post('/like', function(req, res, next) {
     let post_id = req.body.post_id;
     let user_id = req.body.user_id;
     let auth_id = req.user.id;
-    var collection = Like.find();
-    collection.findOne({post_id:ObjectId(post_id)},function(err, data){
+    Like.find({post_id:ObjectId(post_id), user_id:ObjectId(user_id)},function(err, data){
         if(data.length >0) {
-                console.log(data.length);
+            var respondLike = data[0].is_like ? false : true;
+            Like.update({ 'post_id': ObjectId(post_id), 'user_id': ObjectId(user_id)}, {$set: {is_like:respondLike}}, function(err, entry) {
+                if(err) {
+                    console.log(err);
+                } else{
+                    console.log(entry);
+                    res.send({respondLike:respondLike});
+                }
+            });
         } else{
             let saveLike = new Like({
                 is_like: 1,
