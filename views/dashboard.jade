@@ -83,21 +83,21 @@ html
                                 .row
                                     .pic-user
                                             a(href='')
-                                                img.postImage.img-circle(src='/images/#{post.user_id.upload}', alt='avatar')
+                                                img.postImage.img-circle(src='/images/#{post.upload}', alt='avatar')
                                     .col-md-6.userName
-                                        h4.header-post-user #{post.user_id.username}
+                                        h4.header-post-user #{post.username}
                                         p Posted on #{format_moment(post.created_at).format("MMM DD, YYYY HH:mmA")}
                             p.contentPost #{post.status}
                                 .gallery
                                     if(post.image)
                                         .eachImage
-                                            img(src='/images/post-images/#{post.image.name}')
+                                            img(src='/images/post-images/#{post.image}')
                                     if(post.video)
                                         .post-video
                                             video(width='400', controls='')
-                                                source#video_here(src='/images/post-images/#{post.video.name}')
+                                                source#video_here(src='/images/post-images/#{post.video}')
                                                 |     Your browser does not support HTML5 video.
-                            .interaction.post-interact(user_id="#{post.user_id.id}", post_id="#{post.id}")
+                            .interaction.post-interact(user_id="#{post.user_id}", post_id="#{post._id}")
                                 a.like(href='javascript:;')
                                     | Like
                                     |  |

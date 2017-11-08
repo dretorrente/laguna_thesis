@@ -23,29 +23,105 @@ router.get('/', function(req, res, next) {
         if (count === 0) {
             console.log("Post is empty.");
         } else {
-            Post.find()
-                .populate({
-                    path: 'image',
-                    model: Image,
-                    select: 'name'
-                })
-                .populate({
-                    path: 'video',
-                    model: Video,
-                    select: 'name'
-                })
-                .populate({
-                    path: 'user_id',
-                    model: User,
-                    select: 'username upload'
-                }).sort({created_at:-1}).exec()
-                .then(data=>{
-                    console.log("Posts entries loaded.", data);
-                    res.render('dashboard', { user_id: req.user.id, posts:data, format_moment:moment });
-                }).catch(err=>{
-                throw err;
-            })
+            Post.aggregate([
+                { "$sort": { "created_at": -1 } },
+                { "$lookup": {
+                    "localField": "user_id",
+                    "from": 'users',
+                    "foreignField": "_id",
+                    "as": "userinfo"
+                } },
+
+                { "$lookup": {
+                    "localField": "video",
+                    "from": 'videos',
+                    "foreignField": "_id",
+                    "as": "videoinfo"
+                } },
+                { "$lookup": {
+                    "localField": "image",
+                    "from": 'images',
+                    "foreignField": "_id",
+                    "as": "imageinfo"
+                } },
+                { "$lookup": {
+                    "localField": "_id",
+                    "from": 'likes',
+                    "foreignField": "post_id",
+                    "as": "likeinfo"
+                } },
+                { "$project": {
+                    "status": 1,
+                    "created_at": 1,
+                    "userinfo.username": 1,
+                    "userinfo.email": 1,
+                    "userinfo._id" : 1,
+                    "userinfo.upload": 1,
+                    "videoinfo.name": 1,
+                    "imageinfo.name": 1,
+                    "likeinfo._id": 1,
+                    "likeinfo.user_id":1,
+                    "likeinfo.is_like": 1,
+                    "likeinfo.post_id": 1
+                } },
+                {
+                    $unwind: {
+                        path: "$likeinfo",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                // {"$group": {
+                //     _id : "$likeinfo._id",
+                //     userlike: {$first:"$likeinfo.user_id"}
+                // }},
+                { "$group": {
+                    _id: "$_id",
+                    created_at: {$first: "$created_at"},
+                    status: {$first:"$status"},
+                    username: {$first: "$userinfo.username"},
+                    email: {$first: "$userinfo.email"},
+                    user_id: {$first: "$userinfo._id"},
+                    upload: {$first: "$userinfo.upload"},
+                    video: {$first: "$videoinfo.name"},
+                    image: {$first: "$imageinfo.name"},
+                    like: {
+                        $push: "$likeinfo"
+                    }
+                } },
+            ],function(err, results){
+                // var str = JSON.stringify(obj, null, 4);
+                console.log(results);
+
+                res.render('dashboard', { user_id: req.user.id,posts: results, format_moment: moment });
+            });
+            // Post.find()
+            //     .populate({
+            //         path: 'image',
+            //         model: Image,
+            //         select: 'name'
+            //     })
+            //     .populate({
+            //         path: 'video',
+            //         model: Video,
+            //         select: 'name'
+            //     })
+            //     .populate({
+            //         path: 'user_id',
+            //         model: User,
+            //         select: 'username upload'
+            //     }).aggregate([{
+            //         $lookup:{
+            //             from:
+            //         }
+            //     }]).sort({created_at:-1}).exec()
+            //     .then(data=>{
+            //         console.log("Posts entries loaded.", data);
+            //
+            //     }).catch(err=>{
+            //     throw err;
+            // })
         }
+
 });
 
 router.post('/createpost', uploads.single('postimage'), function(req, res, next) {
@@ -116,17 +192,17 @@ router.post('/createpost', uploads.single('postimage'), function(req, res, next)
         req.flash('success_msg', 'Successfully posted.');
         res.redirect('/dashboard');
     }
-    savepost.save();
 });
 
 router.post('/like', function(req, res, next) {
     let post_id = req.body.post_id;
     let user_id = req.body.user_id;
-    let auth_id = req.user.id;
-    Like.find({post_id:ObjectId(post_id), user_id:ObjectId(user_id)},function(err, data){
+    let auth_id = req.user._id;
+
+    Like.find({post_id:ObjectId(post_id), user_id:ObjectId(auth_id)},function(err, data){
         if(data.length >0) {
             var respondLike = data[0].is_like ? false : true;
-            Like.update({ 'post_id': ObjectId(post_id), 'user_id': ObjectId(user_id)}, {$set: {is_like:respondLike}}, function(err, entry) {
+            Like.update({ 'post_id': ObjectId(post_id), 'user_id': ObjectId(auth_id)}, {$set: {is_like:respondLike}}, function(err, entry) {
                 if(err) {
                     console.log(err);
                 } else{
