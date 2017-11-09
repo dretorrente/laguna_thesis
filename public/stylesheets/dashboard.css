@@ -25,7 +25,7 @@ article.post {
 }
 
 
-#form-comment{
+.form-comment{
     display: none;
 }
 .userName {

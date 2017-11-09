@@ -1,10 +1,11 @@
 let express = require('express'),
     router = express.Router(),
     Post = require('../models/post');
-var User = require('../models/user');
-var Image = require('../models/image');
-var Video = require('../models/video');
-let Like = require('../models/like');
+let User = require('../models/user'),
+    Image = require('../models/image'),
+    Video = require('../models/video'),
+    Like = require('../models/like'),
+    Comment = require('../models/comment');
 var moment = require('moment');
 var fs = require('fs');
 var ObjectId = require('mongodb').ObjectId;
@@ -89,9 +90,8 @@ router.get('/', function(req, res, next) {
                     }
                 } },
             ],function(err, results){
-                // var str = JSON.stringify(obj, null, 4);
-                console.log(results);
-
+                var str = JSON.stringify(results, null, 4);
+                console.log(str);
                 res.render('dashboard', { user_id: req.user.id,posts: results, format_moment: moment });
             });
             // Post.find()
@@ -226,39 +226,28 @@ router.post('/like', function(req, res, next) {
             });
        }    
     });
-    // console.log(Like.count());
-    // like.count({post_id:post_id},function(count){
-        
-       // if(count != null) {
-       //      Like.findOne({post_id: post_id, user_id: user_id},function(err, entry){
-       //          console.log(entry);
-       //           res.send({success: 'false'});
-       //      });
-       // } else{
-       //      let saveLike = new Like({
-       //          is_like: 1,
-       //          user_id: user_id,
-       //          post_id: post_id
-       //      });
-
-       //      saveLike.save(function(err){
-       //          if(err){
-       //              console.log(err);
-       //          } else{
-       //              res.send({respondLike: 1});
-       //          }
-       //      });
-       // }    
-    // });
-    // Like.findOne({_id: post_id, user_id: user_id},function(err, data){
-    //     if(data != null){
-    //         console.log(1);
-    //     }else{
-    //         console.log(2);
-    //     }
-    // });
-    
-    // console.log("ASDASD",req.body);
    
+});
+
+router.post('/createComment', function(req, res, next) {
+    let auth_id = req.user._id,
+        user_id = req.body.user_id,
+        comment = req.body.comment,
+        post_id = req.body.post_id;
+    let savecomment = new Comment({
+        comment: comment,
+        user_id: auth_id,
+        post_id: post_id
+    });
+
+    savecomment.save(function(err, data){
+        if(err){
+            res.send({success: false});
+        } else{
+
+            res.send({data: data,user:req.user, success: true});
+        }
+    });
+
 });
 module.exports = router;

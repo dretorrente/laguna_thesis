@@ -89,20 +89,32 @@ html
                                         p Posted on #{format_moment(post.created_at).format("MMM DD, YYYY HH:mmA")}
                             p.contentPost #{post.status}
                                 .gallery
-                                    if(post.image)
+                                    if(post.image != '')
                                         .eachImage
                                             img(src='/images/post-images/#{post.image}')
-                                    if(post.video)
+                                    if(post.video != '')
                                         .post-video
                                             video(width='400', controls='')
                                                 source#video_here(src='/images/post-images/#{post.video}')
                                                 |     Your browser does not support HTML5 video.
+                            - var isLike = 'Like'
+                            for postlike in post.like
+                                if(postlike.is_like && postlike.user_id == user_id)
+                                   - isLike = "Liked"
                             .interaction.post-interact(user_id="#{post.user_id}", post_id="#{post._id}")
                                 a.like(href='javascript:;')
-                                    | Like
+                                    | #{isLike}
                                     |  |
-                                a.comment(href='javascript:;')  Comment |
+                                a.commentTag(href='javascript:;')  Comment |
                                 a.share(href='javascript:;')  Share
+                                .form-comment
+                                    .commentSection
+
+                                    form(action='', method='post')
+                                        .form-group.comment-group
+                                            textarea.commentBox.form-control.commentBox(name='commentBox', rows='2', placeholder='Type your comment here..')
+                                        input.hiddenPost.form-control(type='hidden', name='hidden_id', value='#{post._id}')
+                                        button.btn.btn-default.commentSubmit(type='button') Comment
                             .appendLike
                                 | Camsasota and 5 others like this
 
