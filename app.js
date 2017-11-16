@@ -12,7 +12,9 @@ var express = require('express'),
     mongoose = require('mongoose'),
     fs = require('fs'),
     https = require('https');
-
+var http = require('http');
+var hat = require('hat');
+var ws = require('ws');
 // Load models
 var User = require('./models/user');
 var Like = require('./models/like');
@@ -26,7 +28,8 @@ var options = {
 };
 var app = express(),
     mdbUrl = require('./config/database.js'),
-    server = https.createServer(options, app),
+    server = https.createServer(options, app);
+    // server = http.createServer(app);
     io = require('socket.io').listen(server);
 
 const restify = require('express-restify-mongoose');
@@ -36,6 +39,12 @@ const router = express.Router();
 // var index = require('./routes/index');
 var auth = require('./routes/auth');
 var dashboard = require('./routes/index');
+// var wsServer = new ws.Server({ server: server });
+var peers = {};
+var waitingId = null;
+var count = 0;
+var nicknames =[];
+var users = {};
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -68,7 +77,7 @@ app.use(session({
 // Passport init
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use(router);
 
 // Express Restify Mongoose
 restify.serve(router, Post);
@@ -76,8 +85,6 @@ restify.serve(router, User);
 restify.serve(router, Like);
 restify.serve(router, Comment);
 restify.serve(router, Image);
-app.use(router);
-
 
 // Express Validator
 app.use(expressValidator({
@@ -118,10 +125,51 @@ app.use(function(req, res, next){
   }
   res.redirect('/auth/login');
 });
-app.use('/dashboard', dashboard);
+app.use('/', dashboard);
 require('./routes/video')(app);
+// require('./routes/chat')(app);
+
+// io.sockets.on('connection', function (socket){
+//     socket.on('send message',function(data){
+//        io.sockets.emit('new message', data);
+//     });
+//
+//
+// });
+
 io.sockets.on('connection', function (socket){
-    
+    socket.on('new user', function(data, callback){
+        if(data in users){
+            callback(false);
+        } else{
+            socket.nickname = data;
+            users[socket.nickname] = socket;
+            updateNicknames();
+        }
+
+    });
+
+    function updateNicknames(){
+        io.sockets.emit('usernames', Object.keys(users));
+    }
+
+    // socket.on('send video',function(data,callback){
+    //    var username = data.trim();
+    //     for (var i = 0; i <= nicknames.length; i++) {
+    //         if(nicknames[i].username === username){
+    //             nicknames[i].emit('video-call',{nick: socket.nickname})
+    //         }
+    //     }
+    // });
+
+    socket.on('disconnect',function(data){
+        if(!socket.nickname) return;
+        // console.log(socket.nickname);
+        console.log("BEFORE",users);
+        delete users[socket.nickname];
+        console.log(users);
+        updateNicknames();
+    });
 	function log(){
         var array = [">>> Message from server: "];
         for (var i = 0; i < arguments.length; i++) {
@@ -134,13 +182,13 @@ io.sockets.on('connection', function (socket){
 		log('Got message: ', message);
         socket.broadcast.to(socket.room).emit('message', message);
 	});
-    
+
 	socket.on('create or join', function (message) {
         var room = message.room;
         socket.room = room;
         var participantID = message.from;
         configNameSpaceChannel(participantID);
-        
+
 		var numClients = io.sockets.clients(room).length;
 
 		log('Room ' + room + ' has ' + numClients + ' client(s)');
@@ -155,11 +203,11 @@ io.sockets.on('connection', function (socket){
 			socket.emit('joined', room);
 		}
 	});
-    
+
     // Setup a communication channel (namespace) to communicate with a given participant (participantID)
     function configNameSpaceChannel(participantID) {
         var socketNamespace = io.of('/'+participantID);
-        
+
         socketNamespace.on('connection', function (socket){
             socket.on('message', function (message) {
                 // Send message to everyone BUT sender

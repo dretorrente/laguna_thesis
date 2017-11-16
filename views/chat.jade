@@ -1,0 +1,23 @@
+doctype html
+html
+    head
+        title LXJS chat - Talk with strangers!
+        link(rel='stylesheet', type='text/css', href='/stylesheets/bootstrap/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/stylesheets/new-style.css')
+    body
+        header
+            h1 Simple Chat App
+            //h2 Talk to strangers!
+            h2.online
+        .container
+            video.local(muted='')
+            video.remote
+        main
+            .chat(style="display:none")
+                .history
+                .controls
+                    form.text
+                        input(type='text')
+                        button.send Send
+                    button.next Next
+        script(src='/javascripts/bundle.js')

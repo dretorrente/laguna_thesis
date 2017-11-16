@@ -1,17 +1,7 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
 var uniqueValidator = require('mongoose-unique-validator');
-var timestamps = require('mongoose-timestamp');
-var Moment = require('moment-timezone');
-var datetime = require('node-datetime');
-var dt;
 
-dt = datetime.create();
-var formatted = dt.format('m/d/Y');
-
-var dateTodo = Moment().tz('Singapore').format().replace(/T/, ' ').replace(/\+/g, ' ');
-var dateStatus = Moment().tz('Singapore').format('ha z').slice(1,4);
-var dateSlice = formatted + ' ' + dateTodo.slice(11,18) + dateStatus;
 var UserSchema = mongoose.Schema({
     username: {
         type: String,
@@ -67,8 +57,12 @@ var UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    created_at: { type: String, default:  dateSlice},
-    updated_at: {type: String, default:  dateSlice},
+    is_login: {
+      type: Boolean,
+      default: false
+    },
+    created_at: { type: Date, default:  Date.now},
+    updated_at: { type: Date, default:  Date.now},
 
     resetPasswordToken: String,
     resetPasswordExpires: Date

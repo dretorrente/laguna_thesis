@@ -5,12 +5,12 @@ html
         link(rel='stylesheet', type='text/css', href='/stylesheets/bootstrap/css/bootstrap.min.css')
         link(rel='stylesheet', type='text/css', href='/stylesheets/font-awesome-4.7.0/css/font-awesome.min.css')
         link(rel='stylesheet', type='text/css', href='/stylesheets/dashboard.css')
-
+        link(rel='stylesheet', type='text/css', href='/stylesheets/chat.css')
     body
         nav.navbar.navbar-default
             #nav-brand-container
-                a.navbar-brand(href='micro-blog.php')
-                    img(src='/stylesheets/dummy/logo1.png', alt='Dispute Bills')
+                a.navbar-brand(href='#')
+                    //img(src='/stylesheets/dummy/logo1.png', alt='Dispute Bills')
             #navbar-quiz.container
                 button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
                     span.sr-only Toggle navigatipon
@@ -21,13 +21,13 @@ html
                 .navbar-collapse.collapse
                     ul.nav.navbar-nav.navbar-right
                         li
-                            a(href='') Home
+                            a(href='/dashboard') Home
                         li
-                            a(href='')
+                            a#usernameAuth(href='/dashboard/profile/#{auth.username}')
                                 img.nav-profile.img-circle(src='')
                                 |  Profile
                         li#message
-                            a(href='#')
+                            a#addClass(href='/dashboard/chatroom')
                                 i.fa.fa-comments#messenger
 
                         li.dropdown
@@ -39,11 +39,15 @@ html
                                     a(href='/auth/logout') Logout
                     form.hidden-xs-down.navbar-form.search-menu.form-inline.pull-right
                         #div-search.input-group(role='group')
-                            input#search.form-control(type='text', name='search', placeholder='Username..', aria-label='Username', aria-describedby='basic-addon1')
+                            input.search.form-control(type='text', name='search', placeholder='Username..', aria-label='Username', aria-describedby='basic-addon1')
                             .input-group
                                 li.nav-item.dropdown.show(style='list-style-type:none;')
-                                    #menuItem.dropdown-menu.dropdown-menu-right(role='menu', style='display:none')
+                                    .menuItem.dropdown-menu.dropdown-menu-right(role='menu', style='display:none')
                                         h6.dropdown-header.active(tabindex='-1') no results found
+                            span.input-group-btn
+                                button#searchButton.btn.btn-danger(type='button')
+                                    span.glyphicon.glyphicon-search
+
 
         section.row.sectionUser
             #divpost.col-md-6.col-md-offset-3
@@ -62,7 +66,7 @@ html
                 .alertMessage.alert(style='display: none; margin-top:10px;')
                 // Say Hi to the User by User Authentication
                 h4
-                    | Hi Dave.
+                    | Hi #{auth.username}.
                 form#createPost(method='post', action="/dashboard/createpost", enctype="multipart/form-data")
                     .form-group#textarea-tweet
                         textarea#txtareaPost.form-control(name='post', rows='4', placeholder="What's on your mind..", required='')
@@ -70,7 +74,8 @@ html
                         .form-group#imagepost-group
                             input#select_image(type='file', name='postimage', accept='image/*|video/*')
                         .form-group#createpost-group
-                            input.form-control(type='hidden', name='hidden_id', value='#{user_id}')
+                            input.hiddenAuthID.form-control(type='hidden', name='hidden_id', value='#{auth.id}')
+                            input.hiddenAuthName.form-control(type='hidden', value='#{auth.username}')
                             button#btnAdd.btn.btn-primary(type='submit', name="submit") Create Post
 
 
@@ -82,44 +87,215 @@ html
                             .info.postByUser
                                 .row
                                     .pic-user
-                                            a(href='')
+                                            a(href='/dashboard/profile/#{post.username}')
                                                 img.postImage.img-circle(src='/images/#{post.upload}', alt='avatar')
                                     .col-md-6.userName
-                                        h4.header-post-user #{post.username}
-                                        p Posted on #{format_moment(post.created_at).format("MMM DD, YYYY HH:mmA")}
+                                        a(href='/dashboard/profile/#{post.username}')
+                                            h4.header-post-user #{post.username}
+                                        if(post.is_share)
+                                            p Shared on #{format_moment(post.created_at).format("MMM DD, YYYY HH:mmA")} from
+                                                a(href='javascript:;')
+                                                    |  #{post.user_share}
+                                        else
+                                            p Posted on #{format_moment(post.created_at).format("MMM DD, YYYY HH:mmA")}
                             p.contentPost #{post.status}
-                                .gallery
-                                    if(post.image != '')
-                                        .eachImage
-                                            img(src='/images/post-images/#{post.image}')
-                                    if(post.video != '')
-                                        .post-video
-                                            video(width='400', controls='')
-                                                source#video_here(src='/images/post-images/#{post.video}')
-                                                |     Your browser does not support HTML5 video.
+                            .gallery
+                                if(post.image != '')
+                                    .eachImage
+                                        img(src='/images/post-images/#{post.image}')
+                                if(post.video != '')
+                                    .post-video
+                                        video(width='400', controls='')
+                                            source.video_here(src='/images/post-images/#{post.video}')
+                                            |     Your browser does not support HTML5 video.
                             - var isLike = 'Like'
                             for postlike in post.like
-                                if(postlike.is_like && postlike.user_id == user_id)
+                                if(postlike.is_like && postlike.user_id == auth.id)
                                    - isLike = "Liked"
                             .interaction.post-interact(user_id="#{post.user_id}", post_id="#{post._id}")
                                 a.like(href='javascript:;')
                                     | #{isLike}
                                     |  |
                                 a.commentTag(href='javascript:;')  Comment |
-                                a.share(href='javascript:;')  Share
+                                if(post.user_id != auth.id)
+                                    a.share(href='javascript:;')  Share |
                                 .form-comment
                                     .commentSection
-
+                                    if(post.comment)
+                                        for comment in post.comment
+                                            for user in users
+                                                if(comment.user_id == user.id)
+                                                    .row.imageCol
+                                                        .col-md-1
+                                                            a(href='/dashboard/profile/#{user.username}')
+                                                                img.imageComment(src="/images/#{user.upload}", alt='sample profile pic')
+                                                        .col-md-10
+                                                            a(href='/dashboard/profile/#{user.username}')
+                                                                | #{user.username}
+                                                            p Commented on #{format_moment(comment.created_at).format("MMM DD, YYYY HH:mmA")}
+                                                            .commentArea.jumbotron
+                                                                p.contentComment #{comment.comment}
                                     form(action='', method='post')
                                         .form-group.comment-group
                                             textarea.commentBox.form-control.commentBox(name='commentBox', rows='2', placeholder='Type your comment here..')
                                         input.hiddenPost.form-control(type='hidden', name='hidden_id', value='#{post._id}')
                                         button.btn.btn-default.commentSubmit(type='button') Comment
                             .appendLike
-                                | Camsasota and 5 others like this
+                                - var countLike = 0
+                                - var firstuser = ''
+                                - var otheruser = ''
+                                if(post.like.length > 0)
+                                    for postlikeuser in post.like
+                                        if(postlikeuser.is_like)
+                                            - countLike += 1
+                                    if(countLike > 1)
+                                        for postlikeuser in post.like
+                                            for user in users
+                                                if(postlikeuser.user_id == user.id)
+                                                    if(user.id == auth.id)
+                                                        - firstuser = "You"
+                                                    else
+                                                        - otheruser = user.username
+                                        if(firstuser != '')
+                                            | You #{countLike-1} others like this
+                                    else if(countLike === 1)
+                                        for postlikeuser in post.like
+                                            for user in users
+                                                if(postlikeuser.user_id == user.id)
+                                                    if(user.id == auth.id)
+                                                        - firstuser = "You"
+                                                    else
+                                                        - firstuser = user.username
+                                        | #{firstuser} like this
 
+
+        #shareModal.modal.fade(tabindex='-1', role='dialog')
+            .modal-dialog(role='document')
+                .modal-content
+                    .modal-header
+                        button.close(type='button', data-dismiss='modal', aria-label='Close')
+                            span(aria-hidden='true') ×
+                        h4.modal-title Confirm Share
+                    .modal-body
+                    .modal-footer
+                        button.btn.btn-default(type='button', data-dismiss='modal') Close
+                        button#btnShare.btn.btn-info(type='button') Ok
+                // /.modal-content
+            // /.modal-dialog
+        // end delete modal
+
+        #live-chat
+            header.clearfix
+                h4 Chat Box
+            .chat(style="display:none")
+                .chat-history
+
+
+                        // end chat-message-content
+                    // end chat-message
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js')
 
     script(src='/javascripts/jquery-3.2.0.min.js')
     script(src='/javascripts/bootstrap.min.js')
     script(src='/javascripts/dateFormat.min.js')
     script(src='/javascripts/api/main.js')
+    script(type='text/javascript', src='/socket.io/socket.io.js')
+    script(type='text/javascript').
+        $(document).ready(function () {
+
+            var room = shortUrl();
+            var username = $(".hiddenAuthName").val();
+            var socket = io.connect();
+            socket.emit('new user', username);
+            socket.on('usernames', function (data) {
+                console.log(data);
+                var html = '';
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i] != username) {
+                        fetch('api/v1/User?query={"username":"' + data[i] + '"}').then(function (res) {
+                            res.json().then(function (entries) {
+                                html +=
+                                    '<div class="chat-message clearfix">' +
+                                    '<img src="/images/' + entries[0].upload + '" alt="" width="32" height="32"/>' +
+                                    '<div class="chat-message-content clearfix">' +
+                                    '<h4>'+entries[0].username+'</h4>' +
+                                    '<a class="videoCall" href="javascript:;" target="_blank">' +
+                                    '<i aria-hidden="true" class="fa fa-video-camera"></i>' +
+                                    '</a>' +
+                                    '<a href="javascript:;">' +
+                                    '<i aria-hidden="true" class="fa fa-weixin"></i>' +
+                                    '</a>' +
+                                    '</div>' +
+                                    '</div>' +
+                                    '<hr/>';
+                            });
+                        });
+                    }
+                }
+                $('.chat-history').append(html);
+
+            });
+            $("#live-chat header.clearfix").click(function () {
+                $(this).parent().find('.chat').slideToggle("slow");
+            });
+
+            $(document).on("click", ".videoCall", function (event) {
+                var roomUrl = $(this).attr('href');
+                var usercall = $(this).parent().find('h4').text();
+                socket.emit('send video',usercall, function (data) {
+                    console.log(data);
+                });
+            });
+
+            socket.on('video-call', function (data) {
+                console.log(data);
+            });
+
+            function shortUrl() {
+                return ("000000" + (Math.random() * Math.pow(36, 6) << 0).toString(36)).slice(-6)
+            }
+        });
+
+//
+            }
+//        });
+
+//            var sock = new WebSocket('wss://' + window.location.host);
+//            var authID = $('.hiddenAuthID').val();
+//            var chatDiv = $('.chat-history');
+//            sock.onopen = function (event) {
+//                fetch('api/v1/User?query={"_id":"' + authID + '"}').then(function (res) {
+//                    res.json().then(function (entries) {
+//                        if(entries.length > 0) {
+//                            sock.send(JSON.stringify({
+//                                type: "online",
+//                                data: entries[0]
+//                            }),function(data){
+//                               if(data)
+//                               {
+//                                   console.log("123");
+//                               } else {
+//                                   console.log("no data");
+//                               }
+//                            });
+//                        }
+//                    });
+//                });
+//            }
+//            var html = "";
+//            sock.onmessage = function (event){
+//                var json = JSON.parse(event.data);
+//                html +=
+//                    '<div class="chat-message clearfix"><img src="#" alt="" width="32" height="32"/>' +
+//                        '<div class="chat-message-content clearfix">' +
+//                            '<img src="#" alt="" width="32" height="32"/>' +
+//                            '<h4>sample</h4>' +
+//                    '</div>' +
+//                    '<p>' + json.name + ': ' + json.data + '<br></p>' +
+//                    '<div class="chat_time pull-left">09:40PM</div>' +
+//                    '</div>' +
+//                    '</li>';
+//                log.html(html);
+//            };
+
+

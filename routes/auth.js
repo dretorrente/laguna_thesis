@@ -5,6 +5,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var async = require('async');
 var User = require('../models/user');
 var multer = require('multer');
+var ObjectId = require('mongodb').ObjectId;
 var fs = require('fs');
 var storage =   multer.diskStorage({
     destination: function (req, file, callback) {
@@ -62,8 +63,14 @@ router.post('/login', function(req, res, next) {
         req.logIn(user, function (err) {
             if (err){
                 return next(err);
+            } else{
+                var collection = User.find();
+                collection.update({ '_id': ObjectId(user._id) }, {$set: {is_login: true} }, function(err, entry) {
+                    // User.find({email:user.email}).updateOne({$set:{is_login:true}});
+                    return res.redirect('/dashboard');
+                });
             }
-            return res.redirect('/dashboard');
+            //
         });
     })(req, res, next);
 });
@@ -129,9 +136,13 @@ router.post('/register', uploads.single('upload'), function(req, res, next){
 
 
 router.get('/logout', function(req, res){
-    req.logout();
-    req.flash('success_msg', 'You are logged out!');
-    res.redirect('/auth/login');
+    var collection = User.find();
+    collection.update({ '_id': ObjectId(req.user.id) }, {$set: {is_login: false} }, function(err, entry) {
+        req.logout();
+        req.flash('success_msg', 'You are logged out!');
+        res.redirect('/auth/login');
+    });
+
 });
 
 module.exports = router;

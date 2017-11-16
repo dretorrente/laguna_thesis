@@ -97,20 +97,20 @@ footer p {
 {
     margin-left: 10px;
 }
-#commentArea {
+.commentArea {
     padding-bottom: 0px !important;
     padding-top: 0px !important;
     text-align: center;
 
 }
-#commentArea p{
+.commentArea p{
     font-size: 18px;
 
 }
-#menuItem{
+.menuItem{
     top: 31px !important;
 }
-#menuItem ul {
+.menuItem ul {
     list-style: none;
 }
 .tweet-panel {
@@ -249,4 +249,13 @@ input#search{
     position: relative;
     bottom: 5px;
     color: lightsteelblue;
+}
+
+
+.inf-content{
+    border:1px solid #DDDDDD;
+    -webkit-border-radius:10px;
+    -moz-border-radius:10px;
+    border-radius:10px;
+    box-shadow: 7px 7px 7px rgba(0, 0, 0, 0.3);
 }

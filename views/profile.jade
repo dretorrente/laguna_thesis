@@ -1,0 +1,123 @@
+doctype html
+html
+    head
+        title  K-Pop World
+        link(rel='stylesheet', type='text/css', href='/stylesheets/bootstrap/css/bootstrap.min.css')
+        link(rel='stylesheet', type='text/css', href='/stylesheets/font-awesome-4.7.0/css/font-awesome.min.css')
+        link(rel='stylesheet', type='text/css', href='/stylesheets/dashboard.css')
+        link(rel='stylesheet', type='text/css', href='/stylesheets/chat.css')
+    body
+        nav.navbar.navbar-default
+            #nav-brand-container
+                a.navbar-brand(href='#')
+                    //img(src='/stylesheets/dummy/logo1.png', alt='Dispute Bills')
+            #navbar-quiz.container
+                button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
+                    span.sr-only Toggle navigatipon
+                    span.icon-bar
+                    span.icon-bar
+                    span.icon-bar
+
+                .navbar-collapse.collapse
+                    ul.nav.navbar-nav.navbar-right
+                        li
+                            a(href='/dashboard') Home
+                        li
+                            a(href='/dashboard/profile/#{auth.username}')
+                                img.nav-profile.img-circle(src='')
+                                |  Profile
+                        li#message
+                            a#addClass(href='#')
+                                i.fa.fa-comments#messenger
+
+                        li.dropdown
+                            a.dropdown-toggle(href='#', data-toggle='dropdown')
+                                span.glyphicon.glyphicon-cog(aria-hidden='true')
+                                b.caret
+                            ul.dropdown-menu
+                                li
+                                    a(href='/auth/logout') Logout
+                    form.hidden-xs-down.navbar-form.search-menu.form-inline.pull-right
+                        #div-search.input-group(role='group')
+                            input.search.form-control(type='text', name='search', placeholder='Username..', aria-label='Username', aria-describedby='basic-addon1')
+                            .input-group
+                                li.nav-item.dropdown.show(style='list-style-type:none;')
+                                    .menuItem.dropdown-menu.dropdown-menu-right(role='menu', style='display:none')
+                                        h6.dropdown-header.active(tabindex='-1') no results found
+                            span.input-group-btn
+                                button#searchButton.btn.btn-danger(type='button')
+                                    span.glyphicon.glyphicon-search
+        .container.bootstrap.snippet
+            .panel-body.inf-content
+                .row
+                    .col-md-4(style="max-height:300px")
+                        img.img-circle.img-thumbnail.isTooltip(alt='', style='width:100%; max-height:300px', title='', src='/images/#{user.upload}', data-original-title='Usuario')
+                    .col-md-6
+                        strong Information
+                        br
+                        .table-responsive
+                            table.table.table-condensed.table-responsive.table-user-information
+                                tbody
+                                    tr
+                                        td
+                                            strong
+                                                span.glyphicon.glyphicon-user.text-primary
+                                                |                                 Username:
+                                        td.text-primary
+                                            | #{user.username}
+                                    tr
+                                        td
+                                            strong
+                                                span.glyphicon.glyphicon-cloud.text-primary
+                                                |                                 Name:
+                                        td.text-primary
+                                            | #{user.name}
+                                    tr
+                                        td
+                                            strong
+                                                span.glyphicon.glyphicon-envelope.text-primary
+                                                |                                 Email:
+                                        td.text-primary
+                                            |#{user.email}
+                                    tr
+                                        td
+                                            strong
+                                                span.glyphicon.glyphicon-calendar.text-primary
+                                                |                                 Member Since:
+                                        td.text-primary
+                                            | #{format_moment(user.created_at).format("MMM DD, YYYY")}
+
+
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js')
+    script(src='/javascripts/jquery-3.2.0.min.js')
+    script(src='/javascripts/bootstrap.min.js')
+    script(src='/javascripts/dateFormat.min.js')
+    script(src='/javascripts/api/main.js')
+//        $(document).ready(function(){
+//            alert(window.location.hostname+":3000/dashboard/profile/{auth.username}")
+//        });
+//            $('.search1').on('keyup', function (e) {
+//                e.preventDefault();
+//                var inputbox = $('.search1').val();
+//                var menu = $(".menuItem1");
+//                inputbox = $.trim(inputbox);
+//                if (inputbox != "") {
+//                    fetch('api/v1/User?query={"username":"' + inputbox + '"}').then(function (res) {
+//                        res.json().then(function (entries) {
+//                            if (entries.length > 0) {
+//                                entries.forEach(function (entry) {
+//                                    output += '<li onclick="fill(' + entry.username + ')">' +
+//                                        '<a href="/dashboard/profile/' + entry.username + '">' + entry.username + '</a>' +
+//                                        '</li>';
+//                                    menu.css("display", "block");
+//
+//                                });
+//                            } else {
+//                                menu.html("");
+//                                output = '';
+//                            }
+//                            menu.html(output);
+//                        });
+//                    });
+//                }
+//            });

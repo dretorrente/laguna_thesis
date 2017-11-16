@@ -10,6 +10,8 @@ var moment = require('moment');
 var fs = require('fs');
 var ObjectId = require('mongodb').ObjectId;
 let multer = require('multer');
+var MJ = require("mongo-fast-join"),
+    mongoJoin = new MJ();
 var storage =   multer.diskStorage({
     destination: function (req, file, callback) {
         callback(null, 'public/images/post-images/');
@@ -20,19 +22,32 @@ var storage =   multer.diskStorage({
 });
 let uploads = multer({ storage : storage});
 router.get('/', function(req, res, next) {
+    if(req.isAuthenticated()){
+        res.redirect('/dashboard');
+    } else{
+        res.redirect('/auth/login');
+    }
+});
+router.get('/dashboard', function(req, res, next) {
     var count = Post.count();
         if (count === 0) {
             console.log("Post is empty.");
         } else {
+
             Post.aggregate([
-                { "$sort": { "created_at": -1 } },
+                { "$sort": { "created_at": 1 } },
                 { "$lookup": {
                     "localField": "user_id",
                     "from": 'users',
                     "foreignField": "_id",
                     "as": "userinfo"
                 } },
-
+                {
+                    $unwind: {
+                        path: "$userinfo",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
                 { "$lookup": {
                     "localField": "video",
                     "from": 'videos',
@@ -51,9 +66,28 @@ router.get('/', function(req, res, next) {
                     "foreignField": "post_id",
                     "as": "likeinfo"
                 } },
+                { "$lookup": {
+                    "localField": "user_shareid",
+                    "from": 'users',
+                    "foreignField": "_id",
+                    "as": "usershareinfo"
+                } },
+                { "$lookup": {
+                    "localField": "_id",
+                    "from": 'comments',
+                    "foreignField": "post_id",
+                    "as": "commentinfo"
+                } },
+                {
+                    $unwind: {
+                        path: "$commentinfo",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
                 { "$project": {
                     "status": 1,
                     "created_at": 1,
+                    "is_share": 1,
                     "userinfo.username": 1,
                     "userinfo.email": 1,
                     "userinfo._id" : 1,
@@ -63,22 +97,19 @@ router.get('/', function(req, res, next) {
                     "likeinfo._id": 1,
                     "likeinfo.user_id":1,
                     "likeinfo.is_like": 1,
-                    "likeinfo.post_id": 1
-                } },
-                {
-                    $unwind: {
-                        path: "$likeinfo",
-                        preserveNullAndEmptyArrays: true
-                    }
-                },
-                // {"$group": {
-                //     _id : "$likeinfo._id",
-                //     userlike: {$first:"$likeinfo.user_id"}
-                // }},
+                    "likeinfo.post_id": 1,
+                    "commentinfo.user_id" :1,
+                    "commentinfo.comment":1,
+                    "commentinfo.created_at": 1,
+                    "usershareinfo.username": 1
+                }},
+
+
                 { "$group": {
                     _id: "$_id",
                     created_at: {$first: "$created_at"},
                     status: {$first:"$status"},
+                    is_share: {$first:"$is_share"},
                     username: {$first: "$userinfo.username"},
                     email: {$first: "$userinfo.email"},
                     user_id: {$first: "$userinfo._id"},
@@ -86,13 +117,29 @@ router.get('/', function(req, res, next) {
                     video: {$first: "$videoinfo.name"},
                     image: {$first: "$imageinfo.name"},
                     like: {
-                        $push: "$likeinfo"
-                    }
+                        $first: "$likeinfo"
+                    },
+                    comment: {
+                        $push: "$commentinfo"
+                    },
+                    user_share:  {$first: "$usershareinfo.username"},
                 } },
+                {
+                    $unwind: {
+                        path: "$likeinfo",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
             ],function(err, results){
                 var str = JSON.stringify(results, null, 4);
+                var sample = [];
+                // sample.push(results);
                 console.log(str);
-                res.render('dashboard', { user_id: req.user.id,posts: results, format_moment: moment });
+                User.find().exec(function(err, users){
+
+                    res.render('dashboard', { auth: req.user,posts: results, format_moment: moment,users: users});
+                });
+
             });
             // Post.find()
             //     .populate({
@@ -124,7 +171,7 @@ router.get('/', function(req, res, next) {
 
 });
 
-router.post('/createpost', uploads.single('postimage'), function(req, res, next) {
+router.post('/dashboard/createpost', uploads.single('postimage'), function(req, res, next) {
     let user_post = req.body.post;
     let user_id    = req.body.hidden_id;
     let savepost = new Post({
@@ -194,7 +241,7 @@ router.post('/createpost', uploads.single('postimage'), function(req, res, next)
     }
 });
 
-router.post('/like', function(req, res, next) {
+router.post('/dashboard/like', function(req, res, next) {
     let post_id = req.body.post_id;
     let user_id = req.body.user_id;
     let auth_id = req.user._id;
@@ -213,7 +260,7 @@ router.post('/like', function(req, res, next) {
         } else{
             let saveLike = new Like({
                 is_like: 1,
-                user_id: user_id,
+                user_id: auth_id,
                 post_id: post_id
             });
 
@@ -229,7 +276,7 @@ router.post('/like', function(req, res, next) {
    
 });
 
-router.post('/createComment', function(req, res, next) {
+router.post('/dashboard/createComment', function(req, res, next) {
     let auth_id = req.user._id,
         user_id = req.body.user_id,
         comment = req.body.comment,
@@ -249,5 +296,104 @@ router.post('/createComment', function(req, res, next) {
         }
     });
 
+});
+
+router.post('/dashboard/share', function(req, res, next) {
+    let user_id = req.body.user_id;
+    let auth_id = req.user._id;
+    let status = req.body.status;
+    if(req.body.video) {
+        var shareVideo = req.body.video;
+        var del = '/',
+            st = 3,
+            token = shareVideo.split(del).slice(st),
+            video = token.join(del);
+        let savevideo = new Video({
+            name: video
+        });
+        savevideo.save(function(err){
+            if (!err) {
+                Video.findOne().sort({_id:-1}).limit(1).exec()
+                    .then(data=>{
+                        let savepost = new Post({
+                            status: status,
+                            user_id: auth_id,
+                            video: data._id,
+                            user_shareid: user_id,
+                            is_share: true
+                        });
+                        savepost.save();
+                        req.flash('success_msg', 'Successfully posted.');
+                        res.send({success:true});
+                    }).catch(err=>{
+                    throw err;
+                });
+            }
+        });
+    } else if(req.body.image) {
+        var shareImage = req.body.image;
+        var delimiter = '/',
+            start = 3,
+            tokens = shareImage.split(delimiter).slice(start),
+            result = tokens.join(delimiter);
+        let savemedia = new Image({
+            name: result
+        });
+        savemedia.save(function(err){
+            if (!err) {
+                Image.findOne().sort({_id:-1}).limit(1).exec()
+                    .then(data=>{
+                        let savepost = new Post({
+                            status: status,
+                            user_id: auth_id,
+                            image: data._id,
+                            user_shareid: user_id,
+                            is_share: true
+                        });
+                        savepost.save();
+                        req.flash('success_msg', 'Successfully posted.');
+                        res.send({success:true});
+                    }).catch(err=>{
+                    throw err;
+                });
+            }
+        });
+    } else {
+        let savepost = new Post({
+            status: status,
+            user_shareid: user_id,
+            user_id: auth_id,
+            is_share: true
+        });
+        savepost.save();
+        req.flash('success_msg', 'Successfully posted.');
+
+    }
+
+});
+
+router.get('/dashboard/profile/:username', function(req, res, next){
+    var username = req.params.username;
+    var collection = User.find();
+    collection.findOne({ username:username }, function(err, user) {
+        res.render('profile',{auth:req.user,user:user,format_moment: moment});
+    });
+
+});
+router.post('/dashboard/search',function(req,res,next){
+    var username = req.body.search;
+    var collection = User.find();
+    collection.findOne({ username:username }, function(err, user) {
+        if(!user) {
+            res.send({success:false});
+        } else{
+            res.send({success:true, username: user.username});
+        }
+    });
+});
+
+
+router.get('/dashboard/chatroom', function(req, res, next){
+        res.render('chatroom',{auth: req.user});
 });
 module.exports = router;
