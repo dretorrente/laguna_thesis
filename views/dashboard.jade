@@ -202,7 +202,6 @@ html
     script(type='text/javascript', src='/socket.io/socket.io.js')
     script(type='text/javascript').
         $(document).ready(function () {
-
             var room = shortUrl();
             var username = $(".hiddenAuthName").val();
             var socket = io.connect();
@@ -229,7 +228,7 @@ html
                                 '<a class="videoCall" data-room="'+room+'" target="_blank">' +
                                 '<i aria-hidden="true" class="fa fa-video-camera"></i>' +
                                 '</a>' +
-                                '<a href="javascript:;">' +
+                                '<a class="chat_time" href="javascript:;">' +
                                 '<i aria-hidden="true" class="fa fa-weixin"></i>' +
                                 '</a>' +
                                 '</div>' +
@@ -245,7 +244,7 @@ html
             $("#live-chat header.clearfix").click(function () {
                 $(this).parent().find('.chat').slideToggle("slow");
             });
-
+            //for video socket
             $(document).on("click", ".videoCall", function (event) {
                 var roomUrl = $(this).attr('data-room');
                 var usercall = $(this).parent().find('h4').text();
@@ -261,6 +260,19 @@ html
                     alert('Why did you press cancel? You should have confirmed');
                 }
             });
+            //for chat socket
+            $(document).on("click", ".chat_time", function (event) {
+                var receiver = $(this).parent().find('h4').text();
+                 $.ajax({
+                        type: "POST",
+                        url: "/dashboard/createThread",
+                        data: {receiver: receiver},
+                        dataType: 'json'
+                    }).done(function (data) {
+                        console.log(data);
+                    });
+            });
+
 
             function shortUrl() {
                 return ("000000" + (Math.random() * Math.pow(36, 6) << 0).toString(36)).slice(-6)

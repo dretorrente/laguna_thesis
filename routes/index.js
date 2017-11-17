@@ -6,12 +6,12 @@ let User = require('../models/user'),
     Video = require('../models/video'),
     Like = require('../models/like'),
     Comment = require('../models/comment');
+    Thread = require('../models/thread');
+    Message = require('../models/message');
 var moment = require('moment');
 var fs = require('fs');
 var ObjectId = require('mongodb').ObjectId;
 let multer = require('multer');
-var MJ = require("mongo-fast-join"),
-    mongoJoin = new MJ();
 var storage =   multer.diskStorage({
     destination: function (req, file, callback) {
         callback(null, 'public/images/post-images/');
@@ -393,17 +393,19 @@ router.post('/dashboard/search',function(req,res,next){
 });
 
 
-router.get('/dashboard/chatroom', function(req, res, next){
+router.get('/dashboard/chatroom/:thread', function(req, res, next){
         res.render('chatroom',{auth: req.user});
-});
 
+});
+router.post('/dashboard/createThread', function(req, res, next){
+    var receiver = req.body.receiver;
+    var sender = 
+});
 router.post('/dashboard/getusers', function(req, res, next){
     let users = JSON.parse(req.body.users);
         let collection = User.find();
         collection.find({ username: { $in: users }}, function (err, entries) {
             if (err) return console.log(err);
-
-            // note: you must wait till the callback is called to send back your response
             res.json({ users: entries });
         });
 });

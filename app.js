@@ -21,6 +21,8 @@ var Like = require('./models/like');
 var Comment = require('./models/comment');
 var Post    = require('./models/post');
 var Image   = require('./models/image');
+var Thread   = require('./models/thread');
+var Message   = require('./models/message');
 //configurations
 var options = {
   key: fs.readFileSync('./file.pem'),
@@ -85,6 +87,8 @@ restify.serve(router, User);
 restify.serve(router, Like);
 restify.serve(router, Comment);
 restify.serve(router, Image);
+restify.serve(router, Thread);
+restify.serve(router, Message);
 
 // Express Validator
 app.use(expressValidator({
