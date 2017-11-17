@@ -396,4 +396,15 @@ router.post('/dashboard/search',function(req,res,next){
 router.get('/dashboard/chatroom', function(req, res, next){
         res.render('chatroom',{auth: req.user});
 });
+
+router.post('/dashboard/getusers', function(req, res, next){
+    let users = JSON.parse(req.body.users);
+        let collection = User.find();
+        collection.find({ username: { $in: users }}, function (err, entries) {
+            if (err) return console.log(err);
+
+            // note: you must wait till the callback is called to send back your response
+            res.json({ users: entries });
+        });
+});
 module.exports = router;

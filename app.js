@@ -140,7 +140,7 @@ require('./routes/video')(app);
 io.sockets.on('connection', function (socket){
     socket.on('new user', function(data, callback){
         if(data in users){
-            callback(false);
+           res.redirect('/auth/logout');
         } else{
             socket.nickname = data;
             users[socket.nickname] = socket;
@@ -153,21 +153,22 @@ io.sockets.on('connection', function (socket){
         io.sockets.emit('usernames', Object.keys(users));
     }
 
-    // socket.on('send video',function(data,callback){
-    //    var username = data.trim();
-    //     for (var i = 0; i <= nicknames.length; i++) {
-    //         if(nicknames[i].username === username){
-    //             nicknames[i].emit('video-call',{nick: socket.nickname})
-    //         }
-    //     }
-    // });
+    socket.on('send video',function(data,callback){
+        callback(true);
+        var roomUrl = data.roomUrl;
+        var username = data.username.trim();
+        for (var i = 0; i <= nicknames.length; i++) {
+            if(username in users){
+                users[username].emit('video-call',{room: roomUrl, nick: socket.nickname});
+            }
+        }
+    });
 
     socket.on('disconnect',function(data){
         if(!socket.nickname) return;
         // console.log(socket.nickname);
-        console.log("BEFORE",users);
+        io.sockets.emit('usernames', Object.keys(users));
         delete users[socket.nickname];
-        console.log(users);
         updateNicknames();
     });
 	function log(){
