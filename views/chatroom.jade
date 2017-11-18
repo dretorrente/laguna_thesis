@@ -54,92 +54,19 @@ html
                 .chat_container
                     .col-sm-3.chat_sidebar
                         .row
-                            .dropdown.all_conversation
-                                button#dropdownMenu2.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-                                    i.fa.fa-weixin(aria-hidden='true')
-                                    |                All Conversations
-
-                                ul.dropdown-menu(aria-labelledby='dropdownMenu2')
                             .member_list
                                 ul.list-unstyled
-                                    li.left.clearfix
-                                        span.chat-img.pull-left
-                                            img.img-circle(src='https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg', alt='User Avatar')
-                                        .chat-body.clearfix
-                                            .header_sec
-                                                strong.primary-font Jack Sparrow
-                                                strong.pull-right
-                                                    | 09:45AM
-                                            .contact_sec
-                                                strong.primary-font (123) 123-456
-                                                span.badge.pull-right 3
-                                    li.left.clearfix
-                                        span.chat-img.pull-left
-                                            img.img-circle(src='https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg', alt='User Avatar')
-                                        .chat-body.clearfix
-                                            .header_sec
-                                                strong.primary-font Jack Sparrow
-                                                strong.pull-right
-                                                    | 09:45AM
-                                            .contact_sec
-                                                strong.primary-font (123) 123-456
-                                                span.badge.pull-right 3
-                                    li.left.clearfix
-                                        span.chat-img.pull-left
-                                            img.img-circle(src='https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg', alt='User Avatar')
-                                        .chat-body.clearfix
-                                            .header_sec
-                                                strong.primary-font Jack Sparrow
-                                                strong.pull-right
-                                                    | 09:45AM
-                                            .contact_sec
-                                                strong.primary-font (123) 123-456
-                                                span.badge.pull-right 3
-                                    li.left.clearfix
-                                        span.chat-img.pull-left
-                                            img.img-circle(src='https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg', alt='User Avatar')
-                                        .chat-body.clearfix
-                                            .header_sec
-                                                strong.primary-font Jack Sparrow
-                                                strong.pull-right
-                                                    | 09:45AM
-                                            .contact_sec
-                                                strong.primary-font (123) 123-456
-                                                span.badge.pull-right 3
-                                    li.left.clearfix
-                                        span.chat-img.pull-left
-                                            img.img-circle(src='https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg', alt='User Avatar')
-                                        .chat-body.clearfix
-                                            .header_sec
-                                                strong.primary-font Jack Sparrow
-                                                strong.pull-right
-                                                    | 09:45AM
-                                            .contact_sec
-                                                strong.primary-font (123) 123-456
-                                                span.badge.pull-right 3
-                                    li.left.clearfix
-                                        span.chat-img.pull-left
-                                            img.img-circle(src='https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg', alt='User Avatar')
-                                        .chat-body.clearfix
-                                            .header_sec
-                                                strong.primary-font Jack Sparrow
-                                                strong.pull-right
-                                                    | 09:45AM
-                                            .contact_sec
-                                                strong.primary-font (123) 123-456
-                                                span.badge.pull-right 3
-                                    li.left.clearfix
-                                        span.chat-img.pull-left
-                                            img.img-circle(src='https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg', alt='User Avatar')
-                                        .chat-body.clearfix
-                                            .header_sec
-                                                strong.primary-font Jack Sparrow
-                                                strong.pull-right
-                                                    | 09:45AM
-                                            .contact_sec
-                                                strong.primary-font (123) 123-456
-                                                span.badge.pull-right 3
-                    // chat_sidebar
+                                    for user in users
+                                        if(user.id != auth.id)
+                                            li.chatsidebar.left.clearfix
+                                                span.chat-img.pull-left
+                                                    img.img-circle(src='/images/#{user.upload}', alt='User Avatar')
+                                                .chat-body.clearfix
+                                                    .header_sec
+                                                        strong.primary-font.username #{user.username}
+
+
+                            // chat_sidebar
                     .col-sm-9.message_section
                         .row
                             .new_message_head
@@ -150,50 +77,84 @@ html
                             // new_message_head
                             .chat_area
                                 ul.list-unstyled
-                                    li.left.clearfix
-                                        span.chat-img1.pull-left
-                                            img.img-circle(src='https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg', alt='User Avatar')
-                                        .chat-body1.clearfix
-                                            p
-                                                | Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia.
-                                            .chat_time.pull-right 09:40PM
-                                    li.left.clearfix
-                                        span.chat-img1.pull-left
-                                            img.img-circle(src='https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg', alt='User Avatar')
-                                        .chat-body1.clearfix
-                                            p
-                                                | Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia.
-                                            .chat_time.pull-right 09:40PM
-                                    li.left.clearfix
-                                        span.chat-img1.pull-left
-                                            img.img-circle(src='https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg', alt='User Avatar')
-                                        .chat-body1.clearfix
-                                            p
-                                                | Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia.
-                                            .chat_time.pull-right 09:40PM
-                                    li.left.clearfix.admin_chat
-                                        span.chat-img1.pull-right
-                                            img.img-circle(src='https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg', alt='User Avatar')
-                                        .chat-body1.clearfix
-                                            p
-                                                | Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia.
-                                            .chat_time.pull-left 09:40PM
-                                    li.left.clearfix.admin_chat
-                                        span.chat-img1.pull-right
-                                            img.img-circle(src='https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg', alt='User Avatar')
-                                        .chat-body1.clearfix
-                                            p
-                                                | Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia.
-                                            .chat_time.pull-left 09:40PM
+                                    for message in messages
+                                        for user in users
+                                            if (message.sender_id === user.id && message.thread_id == thread)
+                                                li.left.clearfix
+                                                    span.chat-img1.pull-left
+                                                        img.img-circle(src='/images/#{user.upload}', alt='User Avatar')
+                                                    .chat-body1.clearfix
+                                                        p
+                                                            | #{message.message}
+                                                        .chat_time.pull-right #{format_moment(message.created_at).format('L HH:mmA')}
                             // chat_area
                             .message_write
-                                form#form-message
-                                    textarea#inputMessage.form-control(placeholder='type a message')
+                                form#form-message(method="post")
+                                    textarea#chatMessage.form-control(placeholder='type a message')
                                     .clearfix
                                     .chat_bottom
+                                    input#authUsername(type='hidden', value='#{auth.username}')
+                                    input#authPic(type='hidden', value='#{auth.upload}')
+                                    input#authID(type='hidden', value='#{auth.id}')
+                                    input#receiverUsername(type='hidden', value='#{receiver}')
+                                    input#thread(type='hidden', value='#{thread}')
                                     button#sendMessage.pull-right.btn.btn-success(type='submit', name="submit") Send
                 // message_section
     script(src='/javascripts/jquery-3.2.0.min.js')
     script(src='/javascripts/bootstrap.min.js')
-    //script(src='/javascripts/dateFormat.min.js')
-    script(src='/javascripts/api/chat.js')
+    script(src='/javascripts/dateFormat.min.js')
+    script(type='text/javascript', src='/socket.io/socket.io.js')
+    script(type='text/javascript').
+        $(document).ready(function () {
+            var socket = io.connect();
+            var formMessage = $('#form-message');
+            var chatMessage = $('#chatMessage');
+            var username = $('#authUsername').val();
+            var receiver = $('#receiverUsername').val();
+            var userID = $('#authID').val();
+            var thread = $('#thread').val();
+            var authPic = $('#authPic').val();
+
+            var roomID;
+
+            $('.chatsidebar').on('click', function () {
+                var receiver = $(this).find('.header_sec').find('.username').html();
+                $.ajax({
+                    type: "POST",
+                    url: "/dashboard/createThread",
+                    data: {receiver: receiver},
+                    dataType: 'json'
+                }).done(function (data) {
+                    if (data.success) {
+                        window.location.href = 'https://' + window.location.host + '/chatroom/' + data.id + '/' + receiver;
+                    } else {
+                        window.location.href = 'https://' + window.location.host + '/chatroom/' + data.id + '/' + receiver;
+                    }
+                });
+            });
+
+            socket.emit('message user', username);
+
+            formMessage.submit(function (e) {
+                e.preventDefault();
+                socket.emit('send message', {message:chatMessage.val(), receiver:receiver, userID:userID, thread:thread});
+                chatMessage.val('');
+            });
+
+            socket.on('new message', function (data) {
+                console.log(data);
+                var html = '';
+                html += '<li class="left clearfix">' +
+                    '<span class="chat-img1 pull-left">' +
+                    ' <img src="/images/'+data.nick.upload+'" alt="User Avatar" class="img-circle"/>' +
+                    '</span>' +
+                    '<div class="chat-body1 clearfix">' +
+                    '<p>' +
+                    data.msg +
+                    '</p>'+
+                    '<div class="chat_time pull-right">'+moment(data.created).format('L HH:mmA')+'</div>' +
+                    '</div>' +
+                    '</li>';
+                $('.chat_area ul').append(html);
+            });
+        });

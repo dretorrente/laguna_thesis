@@ -142,9 +142,9 @@ require('./routes/video')(app);
 // });
 
 io.sockets.on('connection', function (socket){
-    socket.on('new user', function(data, callback){
+    socket.on('new user', function(data, callback,res){
         if(data in users){
-           res.redirect('/auth/logout');
+            delete users[data];
         } else{
             socket.nickname = data;
             users[socket.nickname] = socket;
@@ -174,7 +174,49 @@ io.sockets.on('connection', function (socket){
         io.sockets.emit('usernames', Object.keys(users));
         delete users[socket.nickname];
         updateNicknames();
+        if(!socket.chatname) return;
+        nicknames.splice(nicknames.indexOf(socket.chatname),1);
     });
+
+    //chat
+
+    socket.on('message user', function(data, callback,res){
+        console.log(data);
+        socket.chatname = data;
+        nicknames.push(socket.chatname);
+        updateChatnames();
+    });
+
+    socket.on('send message', function(data){
+        socket.join(data.thread);
+        var collection = User.find();
+        collection.findOne({ username:data.receiver }, function(err, user) {
+            if(!err) {
+                let saveMessage = new Message({
+                    thread_id: data.thread,
+                    sender_id: data.userID,
+                    receiver_id: user._id,
+                    message: data.message,
+                });
+                saveMessage.save(function(err){
+                    if (!err) {
+                        console.log(Date.now);
+                        collection.findOne({ username:socket.chatname }, function(err, user) {
+
+                            io.sockets.in(data.thread).emit('new message',{msg:data.message,nick: user, created:new Date()});
+                        });
+
+                    }
+                });
+            }
+        });
+
+    });
+
+    function updateChatnames(){
+        io.sockets.emit('chatnames', nicknames);
+    }
+
 	function log(){
         var array = [">>> Message from server: "];
         for (var i = 0; i < arguments.length; i++) {

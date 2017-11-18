@@ -391,15 +391,71 @@ router.post('/dashboard/search',function(req,res,next){
         }
     });
 });
+router.get('/chatroom', function(req, res, next){
+    User.find({ username: { $nin: req.user.username } },function(err, users){
+        res.render('chatlist',{auth: req.user, users:users});
+    });
+});
 
+router.get('/chatroom/:thread/:receiver', function(req, res, next){
+    var receiver = req.params.receiver;
+    var thread = req.params.thread;
 
-router.get('/dashboard/chatroom/:thread', function(req, res, next){
-        res.render('chatroom',{auth: req.user});
+    Message.find()
+        .populate({
+            path: thread,
+            model: Thread,
+            select: 'thread_id  sender_id receiver_id message status created_at'
+        }).sort({created_at:1}).exec()
+        .then(data=>{
+            User.find({},function(err, users){
+                res.render('chatroom',{auth: req.user, users:users,receiver:receiver,thread:thread, messages:data,format_moment: moment});
+            });
+        }).catch(err=>{
+        throw err;
+    });
+
+    //
+    //
+    //
+
 
 });
+
 router.post('/dashboard/createThread', function(req, res, next){
     var receiver = req.body.receiver;
-    var sender = 
+    var sender = req.user.id;
+    User.findOne({username:receiver},function(err,user){
+        if(user != null) {
+            Message.findOne({$or: [{receiver_id: user._id,sender_id:sender}, {receiver_id: sender,sender_id:user._id}]}).limit(1).exec()
+                .then(data=>{
+                    if(data != null) {
+                        res.send({success:false, id:data.thread_id});
+                    } else{
+                        let savethread = new Thread();
+
+                        savethread.save(function(err, data){
+                            if (!err) {
+                                Thread.findOne().sort({_id:-1}).limit(1).exec()
+                                    .then(data=>{
+                                        res.send({success:true, id:data._id});
+                                    }).catch(err=>{
+                                    throw err;
+                                });
+                            }
+                        });
+                    }
+
+                    // res.send({success:true});
+                }).catch(err=>{
+                throw err;
+            });
+        }
+    });
+
+
+
+
 });
 router.post('/dashboard/getusers', function(req, res, next){
     let users = JSON.parse(req.body.users);

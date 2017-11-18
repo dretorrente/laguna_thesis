@@ -10,7 +10,7 @@ html
         nav.navbar.navbar-default
             #nav-brand-container
                 a.navbar-brand(href='#')
-                    //img(src='/stylesheets/dummy/logo1.png', alt='Dispute Bills')
+                    img(src='/stylesheets/dummy/logo1.png', alt='Dispute Bills')
             #navbar-quiz.container
                 button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
                     span.sr-only Toggle navigatipon
@@ -27,7 +27,7 @@ html
                                 img.nav-profile.img-circle(src='')
                                 |  Profile
                         li#message
-                            a#addClass(href='#')
+                            a#addClass(href='/chatroom')
                                 i.fa.fa-comments#messenger
 
                         li.dropdown
@@ -45,6 +45,7 @@ html
                                     .menuItem.dropdown-menu.dropdown-menu-right(role='menu', style='display:none')
                                         h6.dropdown-header.active(tabindex='-1') no results found
                             span.input-group-btn
+                                 input.hiddenAuthName.form-control(type='hidden', value='#{auth.username}')
                                 button#searchButton.btn.btn-danger(type='button')
                                     span.glyphicon.glyphicon-search
         .container.bootstrap.snippet
@@ -93,31 +94,3 @@ html
     script(src='/javascripts/bootstrap.min.js')
     script(src='/javascripts/dateFormat.min.js')
     script(src='/javascripts/api/main.js')
-//        $(document).ready(function(){
-//            alert(window.location.hostname+":3000/dashboard/profile/{auth.username}")
-//        });
-//            $('.search1').on('keyup', function (e) {
-//                e.preventDefault();
-//                var inputbox = $('.search1').val();
-//                var menu = $(".menuItem1");
-//                inputbox = $.trim(inputbox);
-//                if (inputbox != "") {
-//                    fetch('api/v1/User?query={"username":"' + inputbox + '"}').then(function (res) {
-//                        res.json().then(function (entries) {
-//                            if (entries.length > 0) {
-//                                entries.forEach(function (entry) {
-//                                    output += '<li onclick="fill(' + entry.username + ')">' +
-//                                        '<a href="/dashboard/profile/' + entry.username + '">' + entry.username + '</a>' +
-//                                        '</li>';
-//                                    menu.css("display", "block");
-//
-//                                });
-//                            } else {
-//                                menu.html("");
-//                                output = '';
-//                            }
-//                            menu.html(output);
-//                        });
-//                    });
-//                }
-//            });
