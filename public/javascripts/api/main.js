@@ -58,16 +58,20 @@ $(document).ready(function(){
                     var html = '';
                     html += '<div class="row imageCol">'+
                                 '<div class="col-md-1 ">'+
-                                    '<img src="/images/'+res.user.upload+'" alt="sample profile pic" class="imageComment">'+
+                                    '<a href="/dashboard/profile/'+res.user.username+'">'+
+                                        '<img src="/images/'+res.user.upload+'" alt="sample profile pic" class="imageComment">'+
+                                    '</a>'+
                                 "</div>"+
-                            '<div class="col-md-10">'+
-                                res.user.username+
-                                '<p>Commented on '+moment(res.data.created_at).format("MMM DD, YYYY HH:mmA")+'</p>'+
-                                ' <div class="jumbotron commentArea">'+
-                                    '<p class="contentComment">'+res.data.comment+'</p>'+
-                                '</div>'+
-                             '</div>'+
-                        '</div>';
+                                    '<div class="col-md-10">'+
+                                        '<a href="/dashboard/profile/'+res.user.username+'">'+
+                                        res.user.username+
+                                        '</a>'+
+                                        '<p>Commented on '+moment(res.data.created_at).format("MMM DD, YYYY HH:mmA")+'</p>'+
+                                        ' <div class="jumbotron commentArea">'+
+                                            '<p class="contentComment">'+res.data.comment+'</p>'+
+                                        '</div>'+
+                                     '</div>'+
+                                '</div>';
                     addComment.val('');
                     $this.parent().parent().find('.commentSection').append(html);
                     // var commentSpan = $this.parent().parent().parent().find('.commentBadge').html();

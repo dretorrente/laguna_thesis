@@ -121,20 +121,20 @@ html
                                     a.share(href='javascript:;')  Share |
                                 .form-comment
                                     .commentSection
-                                    if(post.comment)
-                                        for comment in post.comment
-                                            for user in users
-                                                if(comment.user_id == user.id)
-                                                    .row.imageCol
-                                                        .col-md-1
-                                                            a(href='/dashboard/profile/#{user.username}')
-                                                                img.imageComment(src="/images/#{user.upload}", alt='sample profile pic')
-                                                        .col-md-10
-                                                            a(href='/dashboard/profile/#{user.username}')
-                                                                | #{user.username}
-                                                            p Commented on #{format_moment(comment.created_at).format("MMM DD, YYYY HH:mmA")}
-                                                            .commentArea.jumbotron
-                                                                p.contentComment #{comment.comment}
+                                        if(post.comment)
+                                            for comment in post.comment
+                                                for user in users
+                                                    if(comment.user_id == user.id)
+                                                        .row.imageCol
+                                                            .col-md-1
+                                                                a(href='/dashboard/profile/#{user.username}')
+                                                                    img.imageComment(src="/images/#{user.upload}", alt='sample profile pic')
+                                                            .col-md-10
+                                                                a(href='/dashboard/profile/#{user.username}')
+                                                                    | #{user.username}
+                                                                p Commented on #{format_moment(comment.created_at).format("MMM DD, YYYY HH:mmA")}
+                                                                .commentArea.jumbotron
+                                                                    p.contentComment #{comment.comment}
                                     form(action='', method='post')
                                         .form-group.comment-group
                                             textarea.commentBox.form-control.commentBox(name='commentBox', rows='2', placeholder='Type your comment here..')

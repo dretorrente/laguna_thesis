@@ -6,6 +6,7 @@ html
         link(rel='stylesheet', type='text/css', href='/stylesheets/bootstrap/css/bootstrap.min.css')
         link(rel='stylesheet', type='text/css', href='/stylesheets/font-awesome-4.7.0/css/font-awesome.min.css')
         link(rel='stylesheet', type='text/css', href='/stylesheets/dashboard.css')
+        link(rel='stylesheet', type='text/css', href='/stylesheets/chat.css')
         script(src='https://use.fontawesome.com/45e03a14ce.js')
     body
         nav.navbar.navbar-default
@@ -93,30 +94,32 @@ html
                                     textarea#chatMessage.form-control(placeholder='type a message')
                                     .clearfix
                                     .chat_bottom
-                                    input#authUsername(type='hidden', value='#{auth.username}')
+                                    input.hiddenAuthName(type='hidden', value='#{auth.username}')
                                     input#authPic(type='hidden', value='#{auth.upload}')
                                     input#authID(type='hidden', value='#{auth.id}')
                                     input#receiverUsername(type='hidden', value='#{receiver}')
                                     input#thread(type='hidden', value='#{thread}')
                                     button#sendMessage.pull-right.btn.btn-success(type='submit', name="submit") Send
                 // message_section
+
     script(src='/javascripts/jquery-3.2.0.min.js')
     script(src='/javascripts/bootstrap.min.js')
     script(src='/javascripts/dateFormat.min.js')
     script(type='text/javascript', src='/socket.io/socket.io.js')
+
     script(type='text/javascript').
         $(document).ready(function () {
             var socket = io.connect();
             var formMessage = $('#form-message');
             var chatMessage = $('#chatMessage');
-            var username = $('#authUsername').val();
+            var username = $('.hiddenAuthName').val();
             var receiver = $('#receiverUsername').val();
             var userID = $('#authID').val();
             var thread = $('#thread').val();
             var authPic = $('#authPic').val();
 
             var roomID;
-
+            socket.emit('new user', username);
             $('.chatsidebar').on('click', function () {
                 var receiver = $(this).find('.header_sec').find('.username').html();
                 $.ajax({

@@ -143,6 +143,7 @@ require('./routes/video')(app);
 
 io.sockets.on('connection', function (socket){
     socket.on('new user', function(data, callback,res){
+        console.log(users);
         if(data in users){
             delete users[data];
         } else{

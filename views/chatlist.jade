@@ -47,6 +47,7 @@ html
                                     .menuItem.dropdown-menu.dropdown-menu-right(role='menu', style='display:none')
                                         h6.dropdown-header.active(tabindex='-1') no results found
                             span.input-group-btn
+                                input.hiddenAuthName.form-control(type='hidden', value='#{auth.username}')
                                 button#searchButton.btn.btn-danger(type='button')
                                     span.glyphicon.glyphicon-search
 
@@ -66,6 +67,11 @@ html
                                                     strong.primary-font.username #{user.username}
                             // chat_sidebar
                 // message_section
+        #live-chat
+            header.clearfix
+                h4 Online
+            .chat(style="display:none")
+                .chat-history
     script(src='/javascripts/jquery-3.2.0.min.js')
     script(src='/javascripts/bootstrap.min.js')
     //script(src='/javascripts/dateFormat.min.js')

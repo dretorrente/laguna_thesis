@@ -88,9 +88,15 @@ html
                                         td.text-primary
                                             | #{format_moment(user.created_at).format("MMM DD, YYYY")}
 
-
+        #live-chat
+            header.clearfix
+                h4 Online
+            .chat(style="display:none")
+                .chat-history
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js')
     script(src='/javascripts/jquery-3.2.0.min.js')
     script(src='/javascripts/bootstrap.min.js')
     script(src='/javascripts/dateFormat.min.js')
     script(src='/javascripts/api/main.js')
+    script(type='text/javascript', src='/socket.io/socket.io.js')
+    script(type='text/javascript', src='/javascripts/api/chat.js')
